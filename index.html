@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HSB — Biblioteca de Ejercicios</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--red:#d4001a;--black:#0a0a0a;--white:#fff;--gray:#f5f5f5;--gray2:#e8e8e8;--gray3:#888;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(--black);-webkit-font-smoothing:antialiased;}
+
+/* HEADER */
+.header{background:var(--black);padding:0 20px;border-bottom:2px solid var(--red);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;height:52px;gap:12px;}
+.header-logo{font-weight:900;font-size:18px;color:#fff;letter-spacing:-0.5px;}
+.header-logo span{color:var(--red);}
+.header-sep{color:var(--red);font-weight:700;}
+.header-title{color:#bbb;font-size:13px;font-weight:500;}
+.header-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;}
+
+/* MOBILE STRIP */
+.mobile-strip{display:none;background:#141414;overflow-x:auto;padding:8px 12px;gap:6px;border-bottom:1px solid #2a2a2a;}
+.mobile-strip-btn{background:#222;color:#aaa;border:none;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0;font-family:inherit;}
+.mobile-strip-btn.active{background:var(--red);color:#fff;}
+.mobile-strip-equip{background:transparent;color:#888;border:1px solid #333;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:11px;white-space:nowrap;flex-shrink:0;font-family:inherit;}
+.mobile-strip-equip.active{color:var(--red);border-color:var(--red);}
+
+/* LAYOUT */
+.layout{display:flex;height:calc(100vh - 52px);}
+
+/* SIDEBAR */
+.sidebar{width:162px;background:#141414;padding:10px 7px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto;}
+.sidebar-label{color:#555;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin:4px 8px 6px;}
+.sidebar-btn{background:transparent;color:#999;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;text-align:left;font-size:12px;font-family:inherit;font-weight:400;transition:all .15s;width:100%;}
+.sidebar-btn.active{background:var(--red);color:#fff;font-weight:700;}
+.sidebar-div{border-top:1px solid #2a2a2a;margin:6px 4px;}
+.sidebar-equip{background:transparent;color:#888;border:1px solid transparent;border-radius:6px;padding:7px 10px;cursor:pointer;text-align:left;font-size:12px;font-family:inherit;font-weight:400;transition:all .15s;width:100%;}
+.sidebar-equip.active{color:var(--red);border-color:#d4001a44;font-weight:600;}
+.sidebar-warmup{background:transparent;color:#777;border:1px solid transparent;border-radius:6px;padding:8px 10px;cursor:pointer;text-align:left;font-size:12px;font-family:inherit;font-weight:600;margin-top:4px;transition:all .15s;width:100%;}
+.sidebar-warmup.active{background:#d4001a18;color:var(--red);border-color:#d4001a33;}
+
+/* LIST */
+.list{width:210px;background:#fff;border-right:1px solid var(--gray2);display:flex;flex-direction:column;flex-shrink:0;}
+.list-tabs{display:flex;border-bottom:1px solid var(--gray2);}
+.list-tab{flex:1;padding:9px 0;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-size:11px;font-weight:700;color:var(--gray3);font-family:inherit;transition:all .15s;}
+.list-tab.active{color:var(--red);border-bottom-color:var(--red);}
+.list-search{padding:10px;border-bottom:1px solid var(--gray2);}
+.list-search input{width:100%;font-size:12px;padding:6px 9px;border-radius:6px;border:1px solid var(--gray2);font-family:inherit;outline:none;background:var(--gray);}
+.list-levels{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap;}
+.list-levels button{font-size:10px;padding:3px 7px;border-radius:20px;border:none;cursor:pointer;font-family:inherit;font-weight:600;}
+.list-count{font-size:10px;color:var(--gray3);margin-top:4px;}
+.list-items{overflow-y:auto;flex:1;}
+.list-item{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 12px;background:transparent;border:none;border-bottom:1px solid var(--gray2);cursor:pointer;text-align:left;font-size:12px;line-height:1.4;color:var(--black);font-family:inherit;gap:6px;transition:background .1s;}
+.list-item.active{background:var(--red);color:#fff;}
+.list-item .lvl{font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;flex-shrink:0;}
+
+/* DETAIL */
+.detail{flex:1;overflow-y:auto;padding:20px 24px;background:var(--gray);}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;opacity:.3;}
+.spinner{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;gap:12px;}
+.spin{width:30px;height:30px;border:3px solid var(--gray2);border-top:3px solid var(--red);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* CARD */
+.card{max-width:680px;}
+.card-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px;padding:16px;background:#fff;border:1px solid var(--gray2);border-radius:12px;flex-wrap:wrap;}
+.card-body{flex:1;min-width:160px;}
+.card-title{font-size:18px;font-weight:800;color:var(--black);margin:0 0 8px;line-height:1.2;}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.muscles-title{font-size:9px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin:0 0 4px;}
+.muscles-row{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;}
+.muscle-pill{font-size:10px;padding:2px 8px;border-radius:12px;font-weight:500;}
+
+/* VIDEO */
+.video-section{background:#fff;border:1px solid var(--gray2);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+.video-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--gray2);}
+.video-title-bar{font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;}
+.video-wrap{aspect-ratio:16/9;background:#000;}
+.video-wrap iframe{width:100%;height:100%;border:none;}
+.video-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;cursor:pointer;background:#111;min-height:200px;}
+.video-placeholder-icon{width:52px;height:52px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.video-placeholder-icon::after{content:'';border-left:18px solid #fff;border-top:11px solid transparent;border-bottom:11px solid transparent;margin-left:5px;}
+.video-placeholder p{color:#888;font-size:12px;}
+
+/* SECTIONS */
+.section{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px;}
+.step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.step-num{min-width:22px;height:22px;background:var(--red);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:13px;color:var(--black);margin:0;line-height:1.6;}
+.tip{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.tip-arrow{color:var(--red);font-size:14px;flex-shrink:0;line-height:1;margin-top:3px;}
+.tip-text{font-size:13px;color:var(--black);margin:0;line-height:1.6;}
+.err{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.err-x{color:#a32d2d;font-size:13px;flex-shrink:0;line-height:1;margin-top:3px;}
+.err-text{font-size:13px;color:var(--black);margin:0;line-height:1.6;}
+
+/* WARMUP */
+.warmup-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid var(--gray2);}
+.warmup-num{min-width:20px;height:20px;background:var(--red);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+
+/* ANATOMY */
+.anatomy{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.anatomy-views{display:flex;gap:10px;align-items:flex-end;}
+.anatomy-label{font-size:8px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;text-align:center;}
+.anatomy-legend{display:flex;align-items:center;gap:4px;margin-top:2px;}
+.anatomy-dot{width:8px;height:8px;border-radius:2px;background:var(--red);}
+
+/* MOBILE */
+.mobile-menu-btn{display:none;background:var(--red);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:auto;}
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .mobile-strip{display:flex;}
+  .mobile-menu-btn{display:block;}
+  .list{position:fixed;left:0;top:52px;bottom:0;z-index:50;display:none;width:240px;box-shadow:4px 0 20px rgba(0,0,0,.2);}
+  .list.open{display:flex;}
+  .detail{padding:14px;}
+  .card-header{flex-direction:column;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">HSB <span>|</span></div>
+    <div class="header-title">Biblioteca de Ejercicios</div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰ Ejercicios</button>
+    <div class="header-badge">360+ ejercicios</div>
+  </div>
+</div>
+
+<div class="mobile-strip" id="mobile-strip"></div>
+
+<div class="layout">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="list" id="list">
+    <div class="list-tabs">
+      <button class="list-tab active" id="tab-ej" onclick="setView('ejercicios')">Ejercicios</button>
+      <button class="list-tab" id="tab-wu" onclick="setView('warmup')">🔥 Calentamiento</button>
+    </div>
+    <div id="search-wrap" class="list-search">
+      <input type="text" id="search" placeholder="Buscar..." oninput="renderList()"/>
+      <div class="list-levels" id="levels"></div>
+      <div class="list-count" id="count"></div>
+    </div>
+    <div class="list-items" id="list-items"></div>
+  </div>
+  <div class="detail" id="detail">
+    <div class="empty">
+      <div style="font-size:40px;">🏋️</div>
+      <p style="font-size:14px;color:var(--gray3);text-align:center;">Selecciona un ejercicio<br>para ver los detalles</p>
+    </div>
+  </div>
+</div>
+
+<script>
+var GROUPS=[
+  {id:'pecho',label:'Pecho'},{id:'espalda',label:'Espalda'},{id:'hombros',label:'Hombros'},
+  {id:'biceps',label:'Bíceps'},{id:'triceps',label:'Tríceps'},{id:'piernas',label:'Piernas'},
+  {id:'gluteos',label:'Glúteos'},{id:'core',label:'Core / Abs'}
+];
+var EQUIP=[{id:'libre',label:'Peso Libre'},{id:'maquina',label:'Máquinas'},{id:'polea',label:'Poleas'}];
+var LEVELS=['Todos','Principiante','Intermedio','Avanzado'];
+var LVL_PAT=['Principiante','Principiante','Principiante','Principiante','Principiante','Intermedio','Intermedio','Intermedio','Intermedio','Intermedio','Intermedio','Avanzado','Avanzado','Avanzado','Avanzado'];
+var LVL_C={Principiante:'#3B6D11',Intermedio:'#BA7517',Avanzado:'#A32D2D'};
+var LVL_BG={Principiante:'#3B6D1118',Intermedio:'#BA751718',Avanzado:'#A32D2D18'};
+var VIEW_MAP={pecho:'front',espalda:'back',hombros:'both',biceps:'front',triceps:'back',piernas:'both',gluteos:'back',core:'front'};
+
+var WARMUPS={
+  pecho:['Rotaciones de hombro hacia atras x20','Band pull-apart x15','Push-up ligero x15','Aperturas con banda x15','Rotaciones de muneca x20'],
+  espalda:['Rotaciones de hombro x20','Cat-cow en cuadrupedia x15','Remo con banda ligera x15','Dislocaciones con palo x10','Extensiones de torso en suelo x12'],
+  hombros:['Circulos de brazo x20 cada sentido','Face pull con banda ligera x15','Elevaciones laterales con banda x15','Rotacion interna/externa con banda x12','Press overhead vacio x15'],
+  biceps:['Rotacion de munecas x20','Curl con banda ligera x15','Stretch de biceps en pared 30s','Supinacion de antebrazo x20','Curl de muneca vacio x15'],
+  triceps:['Rotaciones de codo x20','Extensiones overhead vacias x15','Dips asistidos x10','Stretch de triceps 30s cada lado','Press cerrado vacio x15'],
+  piernas:['Sentadilla sin peso x20','Zancadas sin peso x10 cada lado','Rotaciones de cadera x15','Peso muerto con banda x15','Puente de gluteos x20'],
+  gluteos:['Puente de gluteos x20','Abduccion tumbada con banda x15','Patadas traseras con banda x15','Sentadilla sumo sin peso x15','Rotaciones de cadera de pie x20'],
+  core:['Plancha 30s','Dead bug x10 cada lado','Rotacion de torso de pie x20','Crunch suave x20','Respiracion diafragmatica x10']
+};
+
+// Videos de YouTube por ejercicio (ID de YouTube)
+var VIDEOS={
+  // PECHO
+  'Press banca plano con barra':'1nt4XEBF9Qo',
+  'Press banca inclinado con barra':'DbFgADa4jqE',
+  'Press banca declinado con barra':'LfyQTbU0b5I',
+  'Press banca plano con mancuernas':'VmB1G1K7v94',
+  'Press banca inclinado con mancuernas':'8iPEnn-ltC8',
+  'Aperturas en banco plano':'eozdVDA78K0',
+  'Dips en paralelas':'2z8JmcrW-As',
+  'Pullover con mancuerna':'FK4rHvqTuEA',
+  'Flexiones con lastre':'IODxDxX7oi4',
+  'Cruce de poleas alto':'taI90J1CNTI',
+  'Cruce de poleas bajo':'taI90J1CNTI',
+  'Peck deck / Mariposa':'Jv4UNqEqBOA',
+  // ESPALDA
+  'Remo con barra pronado':'kBWAon7ItDw',
+  'Remo con mancuerna un brazo':'pYcpY20QaE8',
+  'Peso muerto convencional':'op9kVnSso6Q',
+  'Peso muerto rumano':'JCXUYuzwNrM',
+  'Dominadas agarre ancho':'eGo4IYlbE5g',
+  'Dominadas supinas':'eGo4IYlbE5g',
+  'Jalón al pecho agarre ancho':'luezeOFfree',
+  'Jalón neutro':'luezeOFfree',
+  'Remo en polea baja':'GZbfZ033f74',
+  'Face pull':'rep4nFyuGas',
+  'Straight-arm pulldown':'rep4nFyuGas',
+  'Hiperextensiones en banco':'ph3pehkvRO0',
+  // HOMBROS
+  'Press militar con barra de pie':'2yjwXTZQDDI',
+  'Press Arnold':'6Z15_WdXmVw',
+  'Elevaciones laterales con mancuernas':'XPPfXdAy0uI',
+  'Elevaciones frontales con barra':'HBPn-s4QaXk',
+  'Pajaro con mancuernas':'ttvAC3RyfVM',
+  'Face pull en polea':'rep4nFyuGas',
+  'Elevaciones laterales en polea baja':'XPPfXdAy0uI',
+  'Press de hombros en Smith':'2yjwXTZQDDI',
+  // BICEPS
+  'Curl con barra recta':'kwG2ipFRgfo',
+  'Curl alterno con mancuernas':'sAq_ocpHZP8',
+  'Curl martillo':'TwD-YGVP4Bk',
+  'Curl concentrado':'Dw1nvW4MqSQ',
+  'Curl predicador con barra':'fIwP-FRFNU8',
+  'Curl inverso con barra':'nYMq8GCi6p4',
+  'Curl en polea baja':'kwG2ipFRgfo',
+  'Curl spider':'sAq_ocpHZP8',
+  // TRICEPS
+  'Press frances con barra':'d_KZxkY_0cM',
+  'Rompecraneos con barra EZ':'d_KZxkY_0cM',
+  'Extension con mancuerna sobre cabeza':'_gsUck-KNKs',
+  'Fondos en paralelas':'2z8JmcrW-As',
+  'Press cerrado con barra':'nEIjMJbpBFM',
+  'Pushdown en polea con cuerda':'vB5OHsJ3EME',
+  'Pushdown en polea con barra':'vB5OHsJ3EME',
+  'Extension sobre cabeza en polea':'_gsUck-KNKs',
+  'Kickback en polea':'vB5OHsJ3EME',
+  // PIERNAS
+  'Sentadilla con barra trasera':'bEv6CCg2BC8',
+  'Sentadilla con barra delantera':'QNYFbxEFRe0',
+  'Peso muerto sumo':'DCkPsCBJFNs',
+  'Sentadilla bulgara':'2C-uHIlBFeo',
+  'Zancadas con barra':'D7KaRcUTQeE',
+  'Zancadas con mancuernas':'D7KaRcUTQeE',
+  'Prensa de piernas 45':'PEKEULhAqfM',
+  'Extension de cuadriceps':'YyvSfVjQeL0',
+  'Curl femoral tumbado':'1Tq3QdYUuHs',
+  'Hack squat en maquina':'0VBPy4V8OaY',
+  'Curl femoral en polea baja':'1Tq3QdYUuHs',
+  'RDL en polea':'JCXUYuzwNrM',
+  // GLUTEOS
+  'Hip thrust con barra':'xUQ5BbVFJRc',
+  'Sentadilla bulgara':'2C-uHIlBFeo',
+  'Puente de gluteos con barra':'xUQ5BbVFJRc',
+  'Patada trasera en polea':'wV-M8bHwNHw',
+  'Pull through en polea':'Qx9J3VOlUEQ',
+  'Glute drive':'xUQ5BbVFJRc',
+  'Abductor en maquina':'zMQXqf7JZEM',
+  // CORE
+  'Crunch abdominal':'Xyd_fa5zoEU',
+  'Plancha frontal':'pSHjTRCQxIw',
+  'Plancha lateral':'pSHjTRCQxIw',
+  'Russian twist con peso':'wkD8rjkodUI',
+  'Elevacion de piernas colgado':'l4kQd9eWclI',
+  'Ab wheel rollout':'j1-PuMJSB4M',
+  'Dead bug':'_zfBqMCHE6c',
+  'Crunch en polea alta':'Xyd_fa5zoEU',
+  'Woodchop en polea alta':'ykJmrZ5v0Oo',
+  'Pallof press en polea':'AZkZsR0lzRo'
+};
+
+var DB={
+  pecho:{libre:['Press banca plano con barra','Press banca inclinado con barra','Press banca declinado con barra','Press banca plano con mancuernas','Press banca inclinado con mancuernas','Press banca declinado con mancuernas','Aperturas en banco plano','Aperturas en banco inclinado','Pullover con mancuerna','Press con kettlebell plano','Flexiones con lastre','Dips en paralelas','Press suizo con barra','Flyes con mancuernas en suelo','Push press con mancuernas'],maquina:['Press pecho en maquina Smith plano','Press pecho en maquina Smith inclinado','Peck deck / Mariposa','Crossover maquina sentado','Press de pecho Hammer Strength','Aperturas en maquina','Press convergente inclinado','Chest press neumatico','Maquina de pecho declinado','Press plano palancas','Press inclinado palancas','Aperturas invertidas en maquina','Cable crossover en maquina','Peck deck declinado','Press de pecho asistido'],polea:['Cruce de poleas alto','Cruce de poleas bajo','Cruce de poleas medio','Press de pecho en polea baja','Aperturas en polea alta','Aperturas en polea baja','Press inclinado en polea','Press declinado en polea','Pullover en polea alta','Press con cuerda en polea','Single arm crossover','Aperturas unilaterales','Press plano en polea','Cruce de poleas de pie','Fly declinado en polea']},
+  espalda:{libre:['Remo con barra pronado','Remo con barra supinado','Remo con mancuerna un brazo','Remo Pendlay','Peso muerto convencional','Peso muerto rumano','Peso muerto sumo','Dominadas agarre ancho','Dominadas agarre neutro','Dominadas supinas','Remo T-bar','Encogimientos con barra','Remo Yates','Pull-over con barra','Remo gironda'],maquina:['Jalon al pecho agarre ancho','Jalon al pecho agarre estrecho','Jalon neutro','Jalon tras nuca','Remo en maquina sentado','Remo Hammer Strength','Row asistido','Pulldown Hammer Strength','Maquina de remo unilateral','Remo sentado agarre supino','Hiperextensiones en banco','Maquina de espalda','Low row maquina','Mid row maquina','High row maquina'],polea:['Jalon en polea alta agarre ancho','Jalon en polea agarre neutro','Jalon unilateral','Remo en polea baja','Remo unilateral en polea','Remo con cuerda','Pull-over en polea alta','Remo inclinado en polea','Jalon tras nuca en polea','Face pull','Remo alto en polea','Jalon supino en polea','Remo en polea alta agarre abierto','Straight-arm pulldown','Remo a la cadera en polea']},
+  hombros:{libre:['Press militar con barra de pie','Press militar sentado','Press Arnold','Elevaciones laterales con mancuernas','Elevaciones frontales con barra','Elevaciones frontales alternas','Pajaro con mancuernas','Remo al cuello con barra','Press trasnuca','Face pull con banda','Encogimientos con mancuernas','Press Z-press','Elevaciones laterales tumbado','Curl de hombro','Pajaro inclinado'],maquina:['Press de hombros en Smith','Press de hombros Hammer Strength','Elevaciones laterales en maquina','Elevaciones frontales en maquina','Pajaro en maquina peck deck inverso','Remo al cuello en maquina','Press de hombros asistido','Maquina de elevaciones laterales unilateral','Shoulder press neumatico','Elevaciones laterales sentado en maquina','Press mancuernas en maquina guiada','Aperturas posteriores en maquina','Press vertical de hombros','Maquina de remo alto','Deltoides posterior maquina'],polea:['Elevaciones laterales en polea baja','Elevaciones frontales en polea','Pajaro en polea','Remo al cuello en polea','Press de hombros en polea','Face pull en polea','Elevaciones laterales cruzadas','Upright row en polea','Elevacion lateral unilateral','Rotacion externa en polea','Rotacion interna en polea','Elevaciones laterales con cuerda','Press overhead en polea','Elevaciones 90 en polea','Deltoides posterior en polea']},
+  biceps:{libre:['Curl con barra recta','Curl con barra Z','Curl alterno con mancuernas','Curl martillo','Curl concentrado','Curl predicador con barra','Curl predicador con mancuerna','Curl inverso con barra','Curl 21s','Curl con barra supino ancho','Curl spider','Curl Zottman','Curl inclinado con mancuernas','Curl de pie con barra EZ','Curl cross body'],maquina:['Curl en maquina predicador','Curl en maquina sentado','Curl concentrado en maquina','Curl asistido en maquina','Maquina de biceps unilateral','Curl invertido en maquina','Maquina de predicador bilateral','Curl isometrico en maquina','Cable curl en maquina baja','Curl Hammer en maquina','Maquina de curl alternado','Curl neutro en maquina','Curl en banco predicador maquina','Maquina biceps neumatica','Curl de biceps guiado'],polea:['Curl en polea baja','Curl en polea alta','Curl unilateral en polea','Curl Hammer en polea','Curl predicador en polea','Curl invertido en polea','Curl con cuerda en polea','Curl de pie en polea alta','Curl inclinado en polea','Curl concentrado en polea','Curl supino en polea','Curl spider en polea','Curl bilateral en polea alta','Curl neutro en polea baja','Curl arabe en polea']},
+  triceps:{libre:['Press frances con barra','Press frances con mancuernas','Extension sobre cabeza con barra','Extension con mancuerna sobre cabeza','Fondos en paralelas','Rompecraneos con barra EZ','Press cerrado con barra','Patadas de triceps','Extension unilateral sobre cabeza','Press cerrado mancuernas','Dips en banco','Rompecraneos inclinado','Extension de triceps en suelo','Press cerrado en banco inclinado','Overhead extension dos mancuernas'],maquina:['Extension de triceps en maquina','Press de triceps Hammer Strength','Maquina de fondos asistidos','Pushdown en maquina','Extension sobre cabeza en maquina','Maquina de triceps unilateral','Press cerrado en Smith','Extension invertida en maquina','Maquina neumatica de triceps','Triceps en maquina de palancas','Extension sentado en maquina','Fondos guiados en maquina','Maquina de extension bilateral','Triceps asistido en maquina','Press cerrado guiado'],polea:['Pushdown en polea con barra','Pushdown en polea con cuerda','Pushdown inverso en polea','Extension sobre cabeza en polea','Extension unilateral en polea','Kickback en polea','Pushdown agarre neutro','Extension en polea alta bilateral','Triceps en polea baja','Extension de triceps invertida en polea','Pushdown con mango recto','Pushdown con V-bar','Extension en cruz en polea','Overhead triceps en polea baja','Triceps unilateral polea alta']},
+  piernas:{libre:['Sentadilla con barra trasera','Sentadilla con barra delantera','Peso muerto convencional','Peso muerto rumano','Zancadas con barra','Zancadas con mancuernas','Step-up con mancuernas','Sentadilla bulgara','Hack squat con barra','Sentadilla goblet con kettlebell','Good morning','Sentadilla pistol','Hip thrust con barra','Sentadilla sumo con mancuerna','Peso muerto sumo'],maquina:['Prensa de piernas 45','Prensa horizontal','Extension de cuadriceps','Curl femoral tumbado','Curl femoral sentado','Sentadilla en Smith','Hack squat en maquina','Abductor en maquina','Aductor en maquina','Prensa una pierna','Sentadilla Smith frontal','Leg press vertical','Glute drive maquina','Hip thrust maquina','Extension de cuadriceps unilateral'],polea:['Curl femoral en polea baja','Extension de pierna en polea','Patada trasera en polea','Abduccion en polea','Aduccion en polea','Zancada en polea','Hip thrust en polea','Sentadilla con polea','Curl isquiotibial en polea','Patada lateral en polea','Pull through en polea','Step back en polea','Extension unilateral en polea','Curl de pierna de pie en polea','RDL en polea']},
+  gluteos:{libre:['Hip thrust con barra','Sentadilla bulgara','Peso muerto rumano','Zancadas largas con barra','Step-up con lastre','Sentadilla sumo profunda','Good morning','Puente de gluteos con barra','Zancadas laterales','Hip hinge con kettlebell','Sentadilla goblet profunda','Sentadilla sumo con mancuerna','Peso muerto sumo con mancuerna','Zancadas inversas con barra','Donkey kicks con peso'],maquina:['Hip thrust en maquina','Glute drive','Prensa 45 con pie alto','Extension de cadera en maquina','Abductor en maquina','Curl femoral tumbado foco gluteo','Sentadilla Smith paso ancho','Prensa sumo en maquina','Reverse hyperextension','Maquina de patada trasera','Abductor de pie','Glute kickback maquina','Prensa unilateral pie alto','Maquina de aduccion','Hip extension en banco romano'],polea:['Patada trasera en polea','Patada lateral en polea','Pull through en polea','Hip thrust en polea','Abduccion en polea','Aduccion en polea','Donkey kick en polea','Extension de cadera de pie en polea','Step back en polea','Patada trasera rodilla doblada','Hip extension inclinado en polea','Patada diagonal en polea','Reverse lunge en polea','Glute kickback en polea','RDL en polea']},
+  core:{libre:['Crunch abdominal','Crunch inverso','Crunch bicicleta','Plancha frontal','Plancha lateral','Russian twist con peso','Elevacion de piernas colgado','Rodillas al pecho colgado','Ab wheel rollout','Sit-up completo','Dead bug','Pallof press con banda','Windmill con kettlebell','Turkish get-up','Dragon flag'],maquina:['Crunch en maquina','Crunch inverso en maquina','Rotacion en maquina de cables','Crunch declinado en banco','Hiperextensiones en banco romano','Crunch lateral en maquina','Extension de espalda en maquina','Maquina de oblicuos','Crunch asistido','Rotacion de torso en maquina','Extension lumbar','Maquina de abdominales sentado','Ab coaster maquina','Crunch con palancas','Maquina de core rotacional'],polea:['Crunch en polea alta','Crunch lateral en polea','Rotacion de torso en polea','Pallof press en polea','Crunch invertido en polea','Woodchop en polea alta','Woodchop en polea baja','Woodchop horizontal','Plancha con tiron de polea','Stir the pot en polea','Crunch unilateral en polea','Rotacion anti-lateral en polea','Crunch de pie en polea','Elevacion de rodillas en polea','Rollout en polea']}
+};
+
+// STATE
+var grp='pecho',equip='libre',level='Todos',view='ejercicios',selEx=null;
+
+function getVideoId(name){
+  // Busca coincidencia exacta primero
+  if(VIDEOS[name]) return VIDEOS[name];
+  // Luego busca parcial
+  var keys=Object.keys(VIDEOS);
+  for(var i=0;i<keys.length;i++){
+    if(name.toLowerCase().indexOf(keys[i].toLowerCase())!==-1||keys[i].toLowerCase().indexOf(name.toLowerCase())!==-1){
+      return VIDEOS[keys[i]];
+    }
+  }
+  return null;
+}
+
+function renderSidebar(){
+  var sb=document.getElementById('sidebar');
+  var h='<div class="sidebar-label">Grupo muscular</div>';
+  GROUPS.forEach(function(g){
+    h+='<button class="sidebar-btn'+(grp===g.id?' active':'')+'" onclick="setGroup(\''+g.id+'\')" >'+g.label+'</button>';
+  });
+  h+='<div class="sidebar-div"></div>';
+  h+='<div class="sidebar-label">Equipamiento</div>';
+  EQUIP.forEach(function(e){
+    h+='<button class="sidebar-equip'+(equip===e.id?' active':'')+'" onclick="setEquip(\''+e.id+'\')">'+e.label+'</button>';
+  });
+  h+='<div class="sidebar-div"></div>';
+  h+='<button class="sidebar-warmup'+(view==='warmup'?' active':'')+'" onclick="setView(\'warmup\')">🔥 Calentamiento</button>';
+  sb.innerHTML=h;
+}
+
+function renderMobileStrip(){
+  var strip=document.getElementById('mobile-strip');
+  var h='';
+  GROUPS.forEach(function(g){
+    h+='<button class="mobile-strip-btn'+(grp===g.id?' active':'')+'" onclick="setGroup(\''+g.id+'\')">'+g.label+'</button>';
+  });
+  h+='<div style="width:1px;background:#333;margin:0 4px;flex-shrink:0;"></div>';
+  EQUIP.forEach(function(e){
+    h+='<button class="mobile-strip-equip'+(equip===e.id?' active':'')+'" onclick="setEquip(\''+e.id+'\')">'+e.label+'</button>';
+  });
+  strip.innerHTML=h;
+}
+
+function renderList(){
+  var s=document.getElementById('search');
+  var search=s?s.value.toLowerCase():'';
+  var exs=(DB[grp]&&DB[grp][equip])||[];
+  var wl=exs.map(function(e,i){return{name:e,level:LVL_PAT[i]||'Intermedio'};});
+  var fl=wl.filter(function(e){return(level==='Todos'||e.level===level)&&e.name.toLowerCase().indexOf(search)!==-1;});
+  var lh='';
+  LEVELS.forEach(function(l){
+    var act=level===l;
+    var bg=act?(l==='Todos'?'#333':LVL_BG[l]):'#f0f0f0';
+    var col=act?(l==='Todos'?'#fff':LVL_C[l]):'#888';
+    var bor=act&&l!=='Todos'?'1px solid '+LVL_C[l]+'44':'1px solid transparent';
+    lh+='<button onclick="setLevel(\''+l+'\')" style="font-size:10px;padding:3px 7px;border-radius:20px;border:'+bor+';cursor:pointer;font-family:inherit;font-weight:600;background:'+bg+';color:'+col+';">'+(l==='Todos'?'Todos':l.slice(0,5)+'.')+'</button>';
+  });
+  document.getElementById('levels').innerHTML=lh;
+  document.getElementById('count').textContent=fl.length+' ejercicios';
+  var h='';
+  fl.forEach(function(ex){
+    var act=selEx===ex.name;
+    var lc=LVL_C[ex.level];var lb=LVL_BG[ex.level];
+    var hasVideo=getVideoId(ex.name)?'▶ ':'';
+    h+='<button class="list-item'+(act?' active':'')+'" onclick="loadEx(\''+ex.name.replace(/'/g,'')+'\',\''+ex.level+'\')">';
+    h+='<span>'+hasVideo+ex.name+'</span>';
+    h+='<span class="lvl" style="background:'+(act?'rgba(255,255,255,0.25)':lb)+';color:'+(act?'#fff':lc)+';">'+ex.level.slice(0,3).toUpperCase()+'</span>';
+    h+='</button>';
+  });
+  document.getElementById('list-items').innerHTML=h||'<div style="padding:2rem;text-align:center;font-size:13px;color:var(--gray3);">Sin resultados</div>';
+}
+
+function renderWarmup(){
+  document.getElementById('search-wrap').style.display='none';
+  var wus=WARMUPS[grp]||[];
+  var gl=GROUPS.find(function(g){return g.id===grp;}).label;
+  var h='<div style="padding:12px;border-bottom:1px solid var(--gray2);"><p style="font-size:11px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Calentamiento — '+gl+'</p>';
+  wus.forEach(function(w,i){
+    h+='<div class="warmup-item"><span class="warmup-num">'+(i+1)+'</span><p style="font-size:12.5px;color:var(--black);margin:0;line-height:1.5;">'+w+'</p></div>';
+  });
+  h+='<p style="font-size:11px;color:var(--gray3);margin-top:6px;line-height:1.5;">Realiza este calentamiento antes de entrenar '+gl.toLowerCase()+' para activar la zona y prevenir lesiones.</p></div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function setGroup(g){grp=g;selEx=null;renderSidebar();renderMobileStrip();if(view==='ejercicios'){document.getElementById('search-wrap').style.display='block';renderList();}else renderWarmup();showEmpty();}
+function setEquip(e){equip=e;selEx=null;renderSidebar();renderMobileStrip();if(view==='ejercicios')renderList();showEmpty();}
+function setLevel(l){level=l;renderList();}
+function setView(v){
+  view=v;
+  document.getElementById('tab-ej').classList.toggle('active',v==='ejercicios');
+  document.getElementById('tab-wu').classList.toggle('active',v==='warmup');
+  renderSidebar();
+  if(v==='ejercicios'){document.getElementById('search-wrap').style.display='block';renderList();}
+  else{document.getElementById('search-wrap').style.display='none';renderWarmup();}
+}
+
+function showEmpty(){
+  document.getElementById('detail').innerHTML='<div class="empty"><div style="font-size:40px;">🏋️</div><p style="font-size:14px;color:var(--gray3);text-align:center;">Selecciona un ejercicio<br>para ver los detalles</p></div>';
+}
+
+function getAnatomy(group){
+  var v=VIEW_MAP[group];
+  var R='#d4001a',S='#c8a070',SD='#a07848',SL='#e0c090',LN='#8a6050';
+  function af(z){var m={pecho:['pec'],espalda:[],hombros:['df','dl'],biceps:['bic'],triceps:[],piernas:['quad','calf'],gluteos:[],core:['abs','obl']};return(m[group]||[]).indexOf(z)!==-1;}
+  function ab(z){var m={pecho:[],espalda:['trap','lat','lb'],hombros:['dlb','dp'],biceps:[],triceps:['tri'],piernas:['ham','cb','gb'],gluteos:['gb','ham'],core:['lb']};return(m[group]||[]).indexOf(z)!==-1;}
+  function ff(z){return af(z)?R:S;}function fs(z){return af(z)?'#a32d2d':LN;}
+  function bf(z){return ab(z)?R:S;}function bs(z){return ab(z)?'#a32d2d':LN;}
+  var front='<svg viewBox="0 0 140 340" width="65" height="158"><defs><radialGradient id="hgf2" cx="50%" cy="40%"><stop offset="0%" stop-color="'+SL+'"/><stop offset="100%" stop-color="'+S+'"/></radialGradient></defs><ellipse cx="70" cy="20" rx="15" ry="18" fill="url(#hgf2)" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="63" cy="18" rx="2.5" ry="2" fill="#5a3828" opacity="0.7"/><ellipse cx="77" cy="18" rx="2.5" ry="2" fill="#5a3828" opacity="0.7"/><path d="M65,26 Q70,30 75,26" fill="none" stroke="'+LN+'" stroke-width="0.9" stroke-linecap="round"/><path d="M63,36 Q67,40 70,40 Q73,40 77,36 L76,46 Q73,48 70,48 Q67,48 64,46Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M64,46 Q56,50 48,56 L52,60 Q60,54 70,52 Q80,54 88,60 L92,56 Q84,50 76,46Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="42" cy="66" rx="11" ry="10" transform="rotate(-10,42,66)" fill="'+ff('df')+'" stroke="'+fs('df')+'" stroke-width="0.9"/><ellipse cx="98" cy="66" rx="11" ry="10" transform="rotate(10,98,66)" fill="'+ff('df')+'" stroke="'+fs('df')+'" stroke-width="0.9"/><ellipse cx="40" cy="72" rx="9" ry="8" fill="'+ff('dl')+'" stroke="'+fs('dl')+'" stroke-width="0.8" opacity="0.8"/><ellipse cx="100" cy="72" rx="9" ry="8" fill="'+ff('dl')+'" stroke="'+fs('dl')+'" stroke-width="0.8" opacity="0.8"/><path d="M52,58 Q61,55 69,59 L69,88 Q61,92 52,86 Q47,78 52,58Z" fill="'+ff('pec')+'" stroke="'+fs('pec')+'" stroke-width="1"/><path d="M71,59 Q79,55 88,58 Q93,78 88,86 Q79,92 71,88 L71,59Z" fill="'+ff('pec')+'" stroke="'+fs('pec')+'" stroke-width="1"/><line x1="70" y1="57" x2="70" y2="90" stroke="'+fs('pec')+'" stroke-width="0.5"/><path d="M57,90 Q63,88 69,90 L69,154 Q63,156 57,154 Q53,140 57,90Z" fill="'+ff('abs')+'" stroke="'+fs('abs')+'" stroke-width="0.8"/><path d="M71,90 Q77,88 83,90 Q87,140 83,154 L71,154 L71,90Z" fill="'+ff('abs')+'" stroke="'+fs('abs')+'" stroke-width="0.8"/><line x1="57" y1="108" x2="83" y2="108" stroke="'+fs('abs')+'" stroke-width="0.6"/><line x1="57" y1="124" x2="83" y2="124" stroke="'+fs('abs')+'" stroke-width="0.6"/><line x1="57" y1="140" x2="83" y2="140" stroke="'+fs('abs')+'" stroke-width="0.6"/><line x1="70" y1="90" x2="70" y2="154" stroke="'+fs('abs')+'" stroke-width="0.6"/><path d="M53,94 Q47,112 49,148 Q54,144 58,132 Q56,114 53,94Z" fill="'+ff('obl')+'" stroke="'+fs('obl')+'" stroke-width="0.8"/><path d="M87,94 Q93,112 91,148 Q86,144 82,132 Q84,114 87,94Z" fill="'+ff('obl')+'" stroke="'+fs('obl')+'" stroke-width="0.8"/><path d="M30,68 Q23,76 23,98 Q26,107 33,107 Q40,107 43,98 Q43,76 36,68Z" fill="'+ff('bic')+'" stroke="'+fs('bic')+'" stroke-width="0.9"/><path d="M97,68 Q104,76 117,98 Q114,107 107,107 Q100,107 97,98 Q97,76 104,68Z" fill="'+ff('bic')+'" stroke="'+fs('bic')+'" stroke-width="0.9"/><path d="M25,108 Q20,118 22,140 Q26,147 33,147 Q40,147 44,140 Q46,118 41,108Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M99,108 Q103,118 118,140 Q114,147 107,147 Q100,147 96,140 Q94,118 99,108Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="31" cy="154" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="109" cy="154" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M53,154 Q62,150 70,152 Q78,150 87,154 Q89,166 70,168 Q51,166 53,154Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.9"/><path d="M53,166 Q44,180 44,216 Q48,234 57,238 Q65,240 68,232 Q73,216 71,188 Q69,172 62,166Z" fill="'+ff('quad')+'" stroke="'+fs('quad')+'" stroke-width="0.9"/><path d="M87,166 Q96,180 96,216 Q92,234 83,238 Q75,240 72,232 Q67,216 69,188 Q71,172 78,166Z" fill="'+ff('quad')+'" stroke="'+fs('quad')+'" stroke-width="0.9"/><ellipse cx="58" cy="242" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="82" cy="242" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M50,252 Q44,265 46,292 Q50,306 58,308 Q66,306 68,292 Q70,265 66,252Z" fill="'+ff('calf')+'" stroke="'+fs('calf')+'" stroke-width="0.9"/><path d="M74,252 Q80,265 94,292 Q90,306 82,308 Q74,306 72,292 Q70,265 74,252Z" fill="'+ff('calf')+'" stroke="'+fs('calf')+'" stroke-width="0.9"/><ellipse cx="59" cy="320" rx="13" ry="6" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="81" cy="320" rx="13" ry="6" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/></svg>';
+  var back='<svg viewBox="0 0 140 340" width="65" height="158"><defs><radialGradient id="hgb2" cx="50%" cy="40%"><stop offset="0%" stop-color="'+SL+'"/><stop offset="100%" stop-color="'+S+'"/></radialGradient></defs><ellipse cx="70" cy="20" rx="15" ry="18" fill="url(#hgb2)" stroke="'+LN+'" stroke-width="0.8"/><path d="M63,36 Q67,40 70,40 Q73,40 77,36 L76,46 Q73,48 70,48 Q67,48 64,46Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M64,46 Q56,48 48,56 L52,62 Q62,56 70,54 Q78,56 88,62 L92,56 Q84,48 76,46 Q73,52 70,52 Q67,52 64,46Z" fill="'+bf('trap')+'" stroke="'+bs('trap')+'" stroke-width="1"/><path d="M52,62 Q60,72 70,74 Q80,72 88,62 Q80,68 70,70 Q60,68 52,62Z" fill="'+bf('trap')+'" stroke="'+bs('trap')+'" stroke-width="0.8"/><ellipse cx="41" cy="68" rx="11" ry="10" transform="rotate(10,41,68)" fill="'+bf('dlb')+'" stroke="'+bs('dlb')+'" stroke-width="0.9"/><ellipse cx="99" cy="68" rx="11" ry="10" transform="rotate(-10,99,68)" fill="'+bf('dlb')+'" stroke="'+bs('dlb')+'" stroke-width="0.9"/><ellipse cx="40" cy="74" rx="8" ry="7" fill="'+bf('dp')+'" stroke="'+bs('dp')+'" stroke-width="0.8"/><ellipse cx="100" cy="74" rx="8" ry="7" fill="'+bf('dp')+'" stroke="'+bs('dp')+'" stroke-width="0.8"/><path d="M49,64 Q40,82 42,118 Q50,110 56,100 Q54,82 52,64Z" fill="'+bf('lat')+'" stroke="'+bs('lat')+'" stroke-width="1"/><path d="M91,64 Q100,82 98,118 Q90,110 84,100 Q86,82 88,64Z" fill="'+bf('lat')+'" stroke="'+bs('lat')+'" stroke-width="1"/><path d="M56,64 Q64,62 70,64 Q76,62 84,64 Q80,88 70,92 Q60,88 56,64Z" fill="'+bf('trap')+'" stroke="'+bs('trap')+'" stroke-width="0.8" opacity="0.7"/><rect x="60" y="118" width="9" height="38" rx="4" fill="'+bf('lb')+'" stroke="'+bs('lb')+'" stroke-width="0.8"/><rect x="71" y="118" width="9" height="38" rx="4" fill="'+bf('lb')+'" stroke="'+bs('lb')+'" stroke-width="0.8"/><path d="M30,68 Q22,78 22,106 Q26,114 33,113 Q40,112 42,104 Q43,80 36,68Z" fill="'+bf('tri')+'" stroke="'+bs('tri')+'" stroke-width="0.9"/><path d="M98,68 Q108,78 118,106 Q114,114 107,113 Q100,112 98,104 Q97,80 104,68Z" fill="'+bf('tri')+'" stroke="'+bs('tri')+'" stroke-width="0.9"/><path d="M24,114 Q19,124 21,146 Q25,153 33,153 Q41,153 45,146 Q47,124 42,114Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M98,114 Q102,124 119,146 Q115,153 107,153 Q99,153 95,146 Q93,124 98,114Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="31" cy="160" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="109" cy="160" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M54,156 Q62,152 70,154 Q78,152 86,156 Q88,168 70,170 Q52,168 54,156Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.9"/><path d="M54,168 Q46,176 46,196 Q50,210 62,214 Q70,216 70,210 L70,170Z" fill="'+bf('gb')+'" stroke="'+bs('gb')+'" stroke-width="1"/><path d="M86,168 Q94,176 94,196 Q90,210 78,214 Q70,216 70,210 L70,170Z" fill="'+bf('gb')+'" stroke="'+bs('gb')+'" stroke-width="1"/><line x1="70" y1="170" x2="70" y2="212" stroke="'+bs('gb')+'" stroke-width="0.6"/><path d="M46,208 Q40,222 42,250 Q46,264 56,266 Q64,265 66,256 Q68,240 68,216 Q62,212 54,210Z" fill="'+bf('ham')+'" stroke="'+bs('ham')+'" stroke-width="0.9"/><path d="M94,208 Q100,222 98,250 Q94,264 84,266 Q76,265 74,256 Q72,240 72,216 Q78,212 86,210Z" fill="'+bf('ham')+'" stroke="'+bs('ham')+'" stroke-width="0.9"/><ellipse cx="57" cy="270" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="83" cy="270" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M48,278 Q42,292 44,316 Q48,328 57,330 Q66,328 68,316 Q70,292 66,278Z" fill="'+bf('cb')+'" stroke="'+bs('cb')+'" stroke-width="0.9"/><path d="M72,278 Q78,292 96,316 Q92,328 83,330 Q74,328 72,316 Q70,292 72,278Z" fill="'+bf('cb')+'" stroke="'+bs('cb')+'" stroke-width="0.9"/><ellipse cx="58" cy="342" rx="13" ry="5.5" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="82" cy="342" rx="13" ry="5.5" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/></svg>';
+  var html='<div class="anatomy"><div class="anatomy-views">';
+  if(v==='front'||v==='both') html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">'+front+(v==='both'?'<span class="anatomy-label">Frontal</span>':'')+'</div>';
+  if(v==='back'||v==='both') html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">'+back+(v==='both'?'<span class="anatomy-label">Dorsal</span>':'')+'</div>';
+  html+='</div>';
+  if(v!=='both') html+='<span class="anatomy-label">Vista '+(v==='front'?'frontal':'dorsal')+'</span>';
+  html+='<div class="anatomy-legend"><div class="anatomy-dot"></div><span style="font-size:9px;color:var(--gray3);">Zona activa</span></div></div>';
+  return html;
+}
+
+function buildVideoSection(name){
+  var vid=getVideoId(name);
+  if(!vid){
+    return '<div class="video-section"><div class="video-header"><span class="video-title-bar">Video del ejercicio</span></div><div class="video-wrap"><div class="video-placeholder"><div class="video-placeholder-icon"></div><p>Vídeo no disponible para este ejercicio</p></div></div></div>';
+  }
+  return '<div class="video-section"><div class="video-header"><span class="video-title-bar">▶ Video del ejercicio</span></div><div class="video-wrap"><iframe src="https://www.youtube.com/embed/'+vid+'?rel=0&modestbranding=1" allowfullscreen></iframe></div></div>';
+}
+
+async function loadEx(name,lv){
+  selEx=name;renderList();
+  document.getElementById('list').classList.remove('open');
+  document.getElementById('detail').innerHTML='<div class="spinner"><div class="spin"></div><span style="font-size:13px;color:var(--gray3);">Cargando...</span></div>';
+  try{
+    var eL={libre:'peso libre',maquina:'maquina',polea:'polea'};
+    var gL={pecho:'pecho',espalda:'espalda',hombros:'hombros',biceps:'biceps',triceps:'triceps',piernas:'piernas',gluteos:'gluteos',core:'core/abdominales'};
+    var prompt='Eres un entrenador personal experto. Dame informacion del ejercicio "'+name+'" (grupo: '+gL[grp]+', equipo: '+eL[equip]+', nivel: '+lv+').\nResponde SOLO con JSON valido sin markdown:\n{"nombre":"'+name+'","nivel":"'+lv+'","musculos_principales":["m1"],"musculos_secundarios":["m1"],"tecnica":["Paso 1","Paso 2","Paso 3","Paso 4","Paso 5"],"consejos":["C1","C2","C3"],"errores_comunes":["E1","E2"]}';
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    var data=await res.json();
+    var text=(data.content||[]).map(function(i){return i.text||'';}).join('');
+    var d=JSON.parse(text.replace(/```json|```/g,'').trim());
+    var gl=GROUPS.find(function(g){return g.id===grp;}).label;
+    var el=EQUIP.find(function(e){return e.id===equip;}).label;
+    var h='<div class="card">';
+    // HEADER
+    h+='<div class="card-header">';
+    h+=getAnatomy(grp);
+    h+='<div class="card-body">';
+    h+='<h1 class="card-title">'+d.nombre+'</h1>';
+    h+='<div class="badges">';
+    h+='<span class="badge" style="background:var(--red);color:#fff;">'+gl+'</span>';
+    h+='<span class="badge" style="background:#f0f0f0;color:#555;border:1px solid var(--gray2);">'+el+'</span>';
+    if(d.nivel) h+='<span class="badge" style="background:'+LVL_BG[d.nivel]+';color:'+LVL_C[d.nivel]+';border:1px solid '+LVL_C[d.nivel]+'44;">'+d.nivel+'</span>';
+    h+='</div>';
+    if(d.musculos_principales&&d.musculos_principales.length){
+      h+='<p class="muscles-title">Principales</p><div class="muscles-row">';
+      d.musculos_principales.forEach(function(m){h+='<span class="muscle-pill" style="background:var(--red);color:#fff;">'+m+'</span>';});
+      h+='</div>';
+    }
+    if(d.musculos_secundarios&&d.musculos_secundarios.length){
+      h+='<p class="muscles-title" style="margin-top:4px;">Secundarios</p><div class="muscles-row">';
+      d.musculos_secundarios.forEach(function(m){h+='<span class="muscle-pill" style="background:#f0f0f0;color:#555;border:1px solid var(--gray2);">'+m+'</span>';});
+      h+='</div>';
+    }
+    h+='</div></div>';
+    // VIDEO
+    h+=buildVideoSection(name);
+    // TECNICA
+    h+='<div class="section"><h2 class="section-title" style="color:var(--red);">Tecnica de ejecucion</h2>';
+    (d.tecnica||[]).forEach(function(s,i){h+='<div class="step"><span class="step-num">'+(i+1)+'</span><p class="step-text">'+s+'</p></div>';});
+    h+='</div>';
+    // CONSEJOS
+    h+='<div class="section"><h2 class="section-title" style="color:var(--red);">Consejos clave</h2>';
+    (d.consejos||[]).forEach(function(t){h+='<div class="tip"><span class="tip-arrow">→</span><p class="tip-text">'+t+'</p></div>';});
+    h+='</div>';
+    // ERRORES
+    if(d.errores_comunes&&d.errores_comunes.length){
+      h+='<div class="section" style="background:#fff8f8;border-color:#ffdddd;"><h2 class="section-title" style="color:#a32d2d;">Errores comunes</h2>';
+      d.errores_comunes.forEach(function(e){h+='<div class="err"><span class="err-x">✕</span><p class="err-text">'+e+'</p></div>';});
+      h+='</div>';
+    }
+    h+='</div>';
+    document.getElementById('detail').innerHTML=h;
+  }catch(e){
+    document.getElementById('detail').innerHTML='<div style="text-align:center;padding:2rem;color:var(--gray3);"><p style="margin-bottom:12px;">Error al cargar. Intentalo de nuevo.</p><button onclick="loadEx(\''+name+'\',\''+lv+'\')" style="background:var(--black);color:#fff;border:none;padding:9px 18px;border-radius:6px;font-size:13px;font-weight:700;cursor:pointer;">Reintentar</button></div>';
+  }
+}
+
+// MOBILE
+document.getElementById('mobile-menu-btn').onclick=function(){
+  document.getElementById('list').classList.toggle('open');
+};
+
+// INIT
+renderSidebar();renderMobileStrip();renderList();
+</script>
+</body>
+</html>
