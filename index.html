@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HSB — Biblioteca de Ejercicios</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--red:#d4001a;--black:#0a0a0a;--white:#fff;--gray:#f5f5f5;--gray2:#e8e8e8;--gray3:#888;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(--black);-webkit-font-smoothing:antialiased;}
+.header{background:var(--black);padding:0 20px;border-bottom:2px solid var(--red);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;height:52px;gap:12px;}
+.header-logo{font-weight:900;font-size:18px;color:#fff;letter-spacing:-0.5px;}
+.header-logo span{color:var(--red);}
+.header-title{color:#bbb;font-size:13px;font-weight:500;}
+.header-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.mobile-strip{display:none;background:#141414;overflow-x:auto;padding:8px 12px;gap:6px;border-bottom:1px solid #2a2a2a;}
+.layout{display:flex;height:calc(100vh - 52px);}
+.sidebar{width:168px;background:#141414;padding:10px 7px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto;}
+.sidebar-label{color:#555;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin:4px 8px 6px;}
+.sidebar-btn{background:transparent;color:#999;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;text-align:left;font-size:12px;font-family:inherit;font-weight:400;transition:all .15s;width:100%;}
+.sidebar-btn.active{background:var(--red);color:#fff;font-weight:700;}
+.sidebar-div{border-top:1px solid #2a2a2a;margin:6px 4px;}
+.sidebar-equip{background:transparent;color:#888;border:1px solid transparent;border-radius:6px;padding:7px 10px;cursor:pointer;text-align:left;font-size:12px;font-family:inherit;font-weight:400;transition:all .15s;width:100%;}
+.sidebar-equip.active{color:var(--red);border-color:#d4001a44;font-weight:600;}
+.sidebar-special{background:transparent;color:#777;border:1px solid transparent;border-radius:6px;padding:8px 10px;cursor:pointer;text-align:left;font-size:12px;font-family:inherit;font-weight:600;margin-top:2px;transition:all .15s;width:100%;}
+.sidebar-special.active{background:#d4001a18;color:var(--red);border-color:#d4001a33;}
+.list{width:215px;background:#fff;border-right:1px solid var(--gray2);display:flex;flex-direction:column;flex-shrink:0;}
+.list-tabs{display:flex;border-bottom:1px solid var(--gray2);overflow-x:auto;}
+.list-tab{flex-shrink:0;padding:9px 10px;background:transparent;border:none;border-bottom:2px solid transparent;cursor:pointer;font-size:10px;font-weight:700;color:var(--gray3);font-family:inherit;}
+.list-tab.active{color:var(--red);border-bottom-color:var(--red);}
+.list-search{padding:10px;border-bottom:1px solid var(--gray2);}
+.list-search input{width:100%;font-size:12px;padding:6px 9px;border-radius:6px;border:1px solid var(--gray2);font-family:inherit;outline:none;background:var(--gray);}
+.list-levels{display:flex;gap:3px;margin-top:6px;flex-wrap:wrap;}
+.list-count{font-size:10px;color:var(--gray3);margin-top:4px;}
+.list-items{overflow-y:auto;flex:1;}
+.list-item{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 12px;background:transparent;border:none;border-bottom:1px solid var(--gray2);cursor:pointer;text-align:left;font-size:12px;line-height:1.4;color:var(--black);font-family:inherit;gap:6px;transition:background .1s;}
+.list-item.active{background:var(--red);color:#fff;}
+.list-item-left{display:flex;align-items:center;gap:6px;flex:1;}
+.list-item-star{font-size:12px;cursor:pointer;flex-shrink:0;}
+.lvl{font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px;flex-shrink:0;}
+.detail{flex:1;overflow-y:auto;padding:20px 24px;background:var(--gray);}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;opacity:.3;}
+.card{max-width:680px;}
+.card-header{display:flex;gap:16px;align-items:flex-start;margin-bottom:14px;padding:16px;background:#fff;border:1px solid var(--gray2);border-radius:12px;flex-wrap:wrap;}
+.card-body{flex:1;min-width:160px;}
+.card-title{font-size:18px;font-weight:800;color:var(--black);margin:0 0 8px;line-height:1.2;}
+.badges{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;}
+.badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;}
+.muscles-title{font-size:9px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin:0 0 4px;}
+.muscles-row{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px;}
+.muscle-pill{font-size:10px;padding:2px 8px;border-radius:12px;font-weight:500;}
+.section{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px;}
+.step{display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;}
+.step-num{min-width:22px;height:22px;background:var(--red);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.step-text,.tip-text,.err-text{font-size:13px;color:var(--black);margin:0;line-height:1.6;}
+.tip{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.tip-arrow{color:var(--red);font-size:14px;flex-shrink:0;line-height:1;margin-top:3px;}
+.err{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.err-x{color:#a32d2d;font-size:13px;flex-shrink:0;line-height:1;margin-top:3px;}
+.warmup-item{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px;padding:10px 12px;background:#fff;border-radius:8px;border:1px solid var(--gray2);}
+.warmup-num{min-width:20px;height:20px;background:var(--red);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;}
+.anatomy{display:flex;flex-direction:column;align-items:center;gap:4px;}
+.anatomy-views{display:flex;gap:10px;align-items:flex-end;}
+.anatomy-label{font-size:8px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.8px;text-align:center;}
+.anatomy-legend{display:flex;align-items:center;gap:4px;margin-top:2px;}
+.anatomy-dot{width:8px;height:8px;border-radius:2px;background:var(--red);}
+.rutina-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#fff;border:1px solid var(--gray2);border-radius:8px;margin-bottom:8px;}
+.rutina-item-name{font-size:13px;font-weight:600;color:var(--black);}
+.rutina-item-group{font-size:10px;color:var(--gray3);margin-top:2px;}
+.rutina-remove{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:2px 6px;border-radius:4px;}
+.rutina-remove:hover{color:var(--red);background:#fff0f0;}
+.equip-card{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.equip-card h3{font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+.equip-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;}
+.equip-icon{font-size:18px;flex-shrink:0;margin-top:1px;}
+.equip-text{font-size:13px;color:var(--black);line-height:1.5;}
+.equip-text strong{font-weight:700;}
+.location-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;margin-bottom:6px;}
+.mobile-menu-btn{display:none;background:var(--red);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-left:auto;}
+.add-rutina-btn{background:var(--red);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;margin-top:10px;width:100%;}
+.add-rutina-btn:hover{background:#a32d2d;}
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .mobile-strip{display:flex;}
+  .mobile-menu-btn{display:block;}
+  .list{position:fixed;left:0;top:52px;bottom:0;z-index:50;display:none;width:240px;box-shadow:4px 0 20px rgba(0,0,0,.2);}
+  .list.open{display:flex;}
+  .detail{padding:14px;}
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">HSB <span>|</span></div>
+    <div class="header-title">Biblioteca de Ejercicios</div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰ Ejercicios</button>
+    <div class="header-badge">450+ ejercicios</div>
+  </div>
+</div>
+<div class="mobile-strip" id="mobile-strip"></div>
+<div class="layout">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="list" id="list">
+    <div class="list-tabs">
+      <button class="list-tab active" id="tab-ej" onclick="setView('ejercicios')">Ejercicios</button>
+      <button class="list-tab" id="tab-wu" onclick="setView('warmup')">🔥 Calent.</button>
+      <button class="list-tab" id="tab-rutina" onclick="setView('rutina')">⭐ Mi Rutina</button>
+    </div>
+    <div id="search-wrap" class="list-search">
+      <input type="text" id="search" placeholder="Buscar..." oninput="renderList()"/>
+      <div class="list-levels" id="levels"></div>
+      <div class="list-count" id="count"></div>
+    </div>
+    <div class="list-items" id="list-items"></div>
+  </div>
+  <div class="detail" id="detail">
+    <div class="empty">
+      <div style="font-size:40px;">🏋️</div>
+      <p style="font-size:14px;color:var(--gray3);text-align:center;">Selecciona un ejercicio<br>para ver los detalles</p>
+    </div>
+  </div>
+</div>
+<script>
+var GROUPS=[{id:'pecho',label:'Pecho'},{id:'espalda',label:'Espalda'},{id:'hombros',label:'Hombros'},{id:'biceps',label:'Bíceps'},{id:'triceps',label:'Tríceps'},{id:'piernas',label:'Piernas'},{id:'gluteos',label:'Glúteos'},{id:'core',label:'Core / Abs'}];
+var EQUIP=[{id:'libre',label:'Peso Libre'},{id:'maquina',label:'Máquinas'},{id:'polea',label:'Poleas'},{id:'casa',label:'🏠 En casa'}];
+var LEVELS=['Todos','Principiante','Intermedio','Avanzado'];
+var LVL_PAT=['Principiante','Principiante','Principiante','Principiante','Principiante','Intermedio','Intermedio','Intermedio','Intermedio','Intermedio','Intermedio','Avanzado','Avanzado','Avanzado','Avanzado','Avanzado','Avanzado','Avanzado','Avanzado','Avanzado'];
+var LVL_C={Principiante:'#3B6D11',Intermedio:'#BA7517',Avanzado:'#A32D2D'};
+var LVL_BG={Principiante:'#3B6D1118',Intermedio:'#BA751718',Avanzado:'#A32D2D18'};
+var VIEW_MAP={pecho:'front',espalda:'back',hombros:'both',biceps:'front',triceps:'back',piernas:'both',gluteos:'back',core:'front'};
+
+var WARMUPS={
+  pecho:['Rota los hombros hacia atrás 20 veces — como haciendo círculos grandes con los brazos.','Estira los brazos en X por delante y ábrelos hacia atrás 15 veces con una banda o sin nada.','Haz 15 flexiones suaves sin bajar del todo — solo para calentar.','Abre los brazos hacia los lados 15 veces con una banda elástica o sin peso.','Rota las muñecas 20 veces en cada sentido.'],
+  espalda:['Rota los hombros 20 veces hacia adelante y hacia atrás.','A cuatro patas, haz el gato-vaca: arquea la espalda hacia arriba y hacia abajo 15 veces.','Haz 15 remos suaves con una banda elástica sin peso.','Con un palo o toalla, llévala por encima de la cabeza y bájala por detrás 10 veces.','Tumbado boca abajo, sube el pecho del suelo y aguanta 2 segundos — 12 veces.'],
+  hombros:['Haz círculos grandes con los brazos estirados — 20 veces hacia cada lado.','Haz 15 jalones suaves con una banda elástica sin peso.','Eleva los brazos hacia los lados 15 veces con una banda — muy suave.','Rota el brazo hacia dentro y hacia fuera con una banda ligera — 12 veces cada lado.','Haz 15 press de hombros sin peso o con muy poco — solo para activar.'],
+  biceps:['Rota las muñecas 20 veces en cada sentido.','Haz 15 curls suaves con una banda elástica sin apenas tensión.','Estira el bíceps: extiende el brazo, gira la palma hacia arriba y lleva el brazo hacia atrás. 30 segundos cada lado.','Gira el antebrazo hacia dentro y hacia fuera 20 veces — como abriendo un grifo.','Haz 15 curls de muñeca sin peso para calentar el antebrazo.'],
+  triceps:['Rota los codos 20 veces en cada dirección.','Haz 15 extensiones de tríceps sin peso o con muy poquito.','Haz 10 fondos asistidos — si no llegas, apoya las rodillas.','Estira el tríceps: lleva el codo hacia arriba y empuja el brazo con la otra mano. 30 segundos cada lado.','Haz 15 press cerrado sin peso o con la barra vacía.'],
+  piernas:['Haz 20 sentadillas sin peso — despacio, hasta abajo.','Haz 10 zancadas sin peso por cada pierna.','Rota las caderas: de pie, manos en las caderas, haz círculos grandes. 15 veces cada sentido.','Haz 15 peso muertos con una banda elástica sin apenas tensión.','Haz 20 puentes de glúteos en el suelo sin peso.'],
+  gluteos:['Haz 20 puentes de glúteos en el suelo — arriba aprieta fuerte el glúteo.','Tumbado de lado, sube y baja la pierna de arriba 15 veces — como una almeja abriendo.','Con una banda en los tobillos, da 15 pasos hacia un lado y 15 hacia el otro.','Haz 15 sentadillas sumo sin peso — pies muy abiertos y puntas hacia afuera.','De pie, haz círculos con la cadera 20 veces en cada sentido.'],
+  core:['Aguanta en plancha frontal 30 segundos — cuerpo recto como una tabla.','Haz el dead bug: tumbado boca arriba, baja un brazo y la pierna contraria. 10 veces por lado.','De pie, rota el torso hacia un lado y otro 20 veces — como si miraras hacia atrás.','Haz 20 crunches muy suaves — solo para activar el abdomen.','Practica la respiración de barriga: hincha el abdomen al coger aire y métetelo al soltarlo. 10 veces.']
+};
+
+var DB={
+  pecho:{
+    libre:['Press banca plano con barra','Press banca inclinado con barra','Press banca declinado con barra','Press banca plano con mancuernas','Press banca inclinado con mancuernas','Press banca declinado con mancuernas','Aperturas banco plano con mancuernas','Aperturas banco inclinado con mancuernas','Pullover con mancuerna','Press con kettlebell plano','Flexiones con lastre en la espalda','Dips en paralelas con lastre','Press suizo con barra agarre estrecho','Flyes con mancuernas en suelo','Push press con mancuernas','Press de pecho con barra suiza','Aperturas inclinadas con mancuernas','Press banca agarre estrecho','Svend press con disco','Aperturas declinadas con mancuernas'],
+    maquina:['Peck deck Mariposa','Press pecho maquina Smith plano','Press pecho maquina Smith inclinado','Crossover maquina sentado','Press pecho Hammer Strength plano','Press pecho Hammer Strength inclinado','Press convergente inclinado','Chest press neumatico','Press plano palancas','Press inclinado palancas','Aperturas invertidas maquina','Cable crossover maquina','Peck deck declinado','Press pecho asistido','Maquina de aperturas','Press Smith declinado','Contraction machine pecho','Press pecho unilateral maquina','Aperturas maquina inclinada','Press de pecho convergente'],
+    polea:['Cruce poleas alto','Cruce poleas bajo','Cruce poleas medio','Press pecho polea baja','Aperturas polea alta','Aperturas polea baja','Press inclinado polea','Press declinado polea','Pullover polea alta','Press con cuerda polea','Single arm crossover alto','Single arm crossover bajo','Press plano polea','Cruce poleas de pie','Fly declinado polea','Aperturas inclinadas polea','Aperturas declinadas polea','Press unilateral polea','Crossover inclinado polea','Cable fly neutro'],
+    casa:['Flexiones normales','Flexiones inclinadas pies en silla','Flexiones declinadas manos en silla','Flexiones diamante','Flexiones con palmada','Dips en sillas','Flexiones con manos juntas','Flexiones en pica','Flexiones lentas 3 segundos bajada','Fondos entre dos sillas']
+  },
+  espalda:{
+    libre:['Remo con barra pronado','Remo con barra supinado','Remo mancuerna un brazo','Remo Pendlay','Peso muerto convencional','Peso muerto rumano','Peso muerto sumo','Dominadas agarre ancho','Dominadas agarre neutro','Dominadas supinas','Remo T-bar con barra','Encogimientos con barra','Remo Yates con barra','Pullover con barra','Remo gironda con mancuerna','Peso muerto con mancuernas','Good morning con barra','Remo bajo con mancuernas','Hiperextensiones con peso','Remo con barra a una mano'],
+    maquina:['Jalon pecho agarre ancho','Jalon pecho agarre estrecho','Jalon neutro agarre cerrado','Jalon tras nuca','Remo maquina sentado agarre ancho','Remo Hammer Strength','Row asistido maquina','Pulldown Hammer Strength','Maquina remo unilateral','Remo sentado agarre supino','Hiperextensiones banco romano','Maquina de espalda','Low row maquina','Mid row maquina','High row maquina','Jalon inclinado maquina','Pulldown neutro maquina','Remo convergente maquina','Maquina espalda unilateral','Remo bajo maquina'],
+    polea:['Jalon polea alta agarre ancho','Jalon polea agarre neutro','Jalon unilateral polea','Remo polea baja agarre ancho','Remo unilateral polea','Remo con cuerda polea','Pullover polea alta','Remo inclinado polea','Jalon tras nuca polea','Face pull polea cuerda','Remo alto polea','Jalon supino polea','Straight arm pulldown','Remo cadera polea','Remo polea en polea baja agarre supino','Jalon neutro unilateral','Pullover unilateral polea','Remo en polea sentado agarre estrecho','Cable pull through','Remo agarre en V polea'],
+    casa:['Dominadas en barra de puerta','Remo con mochila cargada','Superman en suelo','Hiperextensiones en suelo','Remo con toalla en puerta','Dominadas supinas barra puerta','Remo invertido bajo mesa','Pull up negativo bajada lenta','Extensiones de espalda en suelo','Remo con botella de agua llena']
+  },
+  hombros:{
+    libre:['Press militar barra de pie','Press militar sentado con barra','Press Arnold con mancuernas','Elevaciones laterales mancuernas','Elevaciones frontales con barra','Elevaciones frontales alternas mancuernas','Pajaro con mancuernas inclinado','Remo al cuello con barra','Press trasnuca con barra','Encogimientos con mancuernas','Press Z-press en suelo','Elevaciones laterales tumbado','Press con mancuernas de pie','Pajaro de pie con mancuernas','Remo al cuello con mancuernas','Press alternado mancuernas','Elevaciones laterales con kettlebell','Rotacion externa con mancuerna','Rotacion interna con mancuerna','Swing lateral con mancuerna'],
+    maquina:['Press hombros Smith de pie','Press hombros Hammer Strength','Elevaciones laterales maquina','Elevaciones frontales maquina','Pajaro maquina peck deck inverso','Remo cuello maquina','Press hombros asistido','Elevaciones laterales unilateral maquina','Shoulder press neumatico','Elevaciones laterales sentado maquina','Press mancuernas maquina guiada','Aperturas posteriores maquina','Press vertical hombros maquina','Maquina remo alto','Deltoides posterior maquina','Press hombros maquina convergente','Maquina elevaciones unilateral','Press militar Smith sentado','Maquina hombros neumática','Elevaciones maquina inclinada'],
+    polea:['Elevaciones laterales polea baja','Elevaciones frontales polea baja','Pajaro en polea baja inclinado','Remo cuello polea','Press hombros en polea baja','Face pull polea media cuerda','Elevaciones laterales cruzadas polea','Upright row polea baja','Elevacion lateral unilateral polea','Rotacion externa polea','Rotacion interna polea','Elevaciones laterales con cuerda polea','Press overhead en polea baja','Elevaciones 90 grados polea','Deltoides posterior polea baja','W-raise en polea','Elevacion frontal unilateral polea','Press Arnold en polea baja','Remo alto con cuerda polea','Lateral raise polea cruzada'],
+    casa:['Press de pino contra la pared','Elevaciones laterales con botellas de agua','Elevaciones frontales con botellas','Pajaro con botellas de agua','Flexiones en pica','Elevaciones con mochila','Encogimientos de hombros sin peso','Press overhead con mochila','Rotaciones de hombro con toalla','Plancha con toque de hombro']
+  },
+  biceps:{
+    libre:['Curl barra recta','Curl barra Z','Curl alterno mancuernas','Curl martillo con mancuernas','Curl concentrado en banco','Curl predicador con barra','Curl predicador con mancuerna','Curl inverso con barra','Curl 21s con barra','Curl barra supino agarre ancho','Curl spider en banco inclinado','Curl Zottman con mancuernas','Curl inclinado mancuernas en banco','Curl de pie barra EZ','Curl cross body mancuerna','Curl con kettlebell','Curl supino con barra','Curl prono con barra','Curl con disco','Curl Bayesian inclinado'],
+    maquina:['Curl maquina predicador bilateral','Curl maquina sentado','Curl concentrado maquina','Curl asistido maquina','Maquina biceps unilateral','Curl invertido maquina','Curl isometrico maquina','Curl Hammer maquina','Maquina curl alternado','Curl neutro maquina','Curl en banco predicador maquina','Curl biceps guiado maquina','Curl maquina inclinado','Curl maquina supino','Maquina curl agarre estrecho','Curl maquina agarre ancho','Curl maquina unilateral agarre supino','Maquina predicador unilateral','Curl neumatico maquina','Curl maquina con rotacion'],
+    polea:['Curl polea baja agarre supino','Curl polea alta agarre supino','Curl unilateral polea baja','Curl Hammer polea baja','Curl predicador polea baja','Curl invertido polea baja','Curl con cuerda polea baja','Curl Bayesian polea alta detras','Curl inclinado polea baja','Curl concentrado polea baja','Curl supino polea alta','Curl spider polea baja','Curl bilateral polea alta','Curl neutro polea baja','Curl arabe polea baja','Curl agarre ancho polea','Curl unilateral polea alta','Curl con barra EZ polea baja','Curl con V-bar polea','Curl con cuerda en polea alta'],
+    casa:['Curl con botellas de agua','Curl martillo con mochila','Curl con toalla en puerta','Chin up supino en barra puerta','Curl con bolsa de compra','Curl con libro pesado','Chin up agarre neutro','Curl isometrico contra mesa','Flexiones supinas','Curl con goma elastica']
+  },
+  triceps:{
+    libre:['Press frances con barra EZ','Press frances con mancuernas','Extension sobre cabeza con barra','Extension con una mancuerna sobre cabeza','Fondos en paralelas','Rompecraneos con barra EZ','Press cerrado con barra','Patadas de triceps con mancuerna','Extension unilateral sobre cabeza mancuerna','Press cerrado con mancuernas','Dips en banco con lastre','Rompecraneos inclinado','Extension triceps en suelo','Press cerrado en banco inclinado','Overhead extension dos mancuernas','Press cerrado con barra Z','Triceps kickback bilateral','Extension triceps con kettlebell','Press cerrado agarre supino','Extension triceps con disco'],
+    maquina:['Extension triceps maquina bilateral','Press triceps Hammer Strength','Maquina fondos asistidos','Pushdown maquina agarre recto','Extension cabeza maquina','Maquina triceps unilateral','Press cerrado Smith','Extension invertida maquina','Maquina neumatica triceps','Extension sentado maquina','Fondos guiados maquina','Maquina extension bilateral agarre neutro','Triceps asistido maquina','Press cerrado guiado Smith inclinado','Extension maquina agarre supino','Pushdown maquina agarre neutro','Extension overhead maquina','Triceps maquina palancas','Extension maquina unilateral','Press frances maquina'],
+    polea:['Pushdown polea alta con barra recta','Pushdown polea alta con cuerda','Pushdown inverso polea alta','Extension sobre cabeza polea baja','Extension unilateral polea alta','Kickback polea baja','Pushdown agarre neutro polea alta','Extension bilateral polea alta','Triceps polea baja tumbado','Extension triceps invertida polea alta','Pushdown mango recto polea alta','Pushdown V-bar polea alta','Extension en cruz polea alta','Overhead triceps polea baja detras','Triceps unilateral polea alta','Extension con cuerda sobre cabeza polea baja','Pushdown con cuerda agarre ancho','Extension bilateral sobre cabeza polea baja','Kickback con cuerda polea baja','Triceps en polea agarre supino'],
+    casa:['Fondos entre dos sillas','Flexiones diamante','Flexiones con manos juntas','Dips en escalon','Extension triceps con mochila','Fondos en silla','Flexiones cerradas lentas','Triceps en suelo tumbado','Extensiones con botellas de agua','Press cerrado en suelo']
+  },
+  piernas:{
+    libre:['Sentadilla barra trasera','Sentadilla barra delantera','Peso muerto convencional','Peso muerto rumano','Zancadas con barra','Zancadas con mancuernas','Step-up con mancuernas','Sentadilla bulgara con mancuernas','Hack squat con barra','Sentadilla goblet con kettlebell','Good morning con barra','Sentadilla pistol','Hip thrust con barra','Sentadilla sumo con mancuerna','Peso muerto sumo','Sentadilla overhead con barra','Zancadas inversas con mancuernas','Sentadilla zercher con barra','Sentadilla lateral con mancuerna','Step up con barra'],
+    maquina:['Prensa piernas 45 grados','Prensa horizontal','Extension cuadriceps maquina','Curl femoral tumbado maquina','Curl femoral sentado maquina','Sentadilla en maquina Smith','Hack squat maquina','Abductor maquina sentado','Aductor maquina sentado','Prensa una pierna unilateral','Sentadilla Smith frontal','Leg press vertical','Glute drive maquina','Hip thrust maquina','Extension cuadriceps unilateral','Prensa piernas inclinada','Curl nordico maquina','Sentadilla Smith sumo','Prensa sumo maquina','Extensiones pierna en maquina sentado'],
+    polea:['Curl femoral polea baja de pie','Extension pierna polea baja','Patada trasera polea baja','Abduccion polea baja','Aduccion polea baja','Zancada polea baja','Hip thrust polea baja','Sentadilla con polea baja','Curl isquiotibial polea baja','Patada lateral polea baja','Pull through polea baja','Step back polea baja','Extension unilateral polea baja','Curl de pierna de pie polea baja','RDL en polea baja','Sentadilla sumo polea baja','Zancada inversa polea baja','Curl femoral bilateral polea baja','Patada frontal polea baja','Extension cadera polea baja'],
+    casa:['Sentadilla sin peso','Sentadilla sumo sin peso','Zancadas sin peso','Sentadilla bulgara en silla','Step up en escalon','Sentadilla pistol asistida','Puente de gluteos en suelo','Zancadas laterales','Sentadilla isometrica en pared','Saltos sentadilla']
+  },
+  gluteos:{
+    libre:['Hip thrust con barra','Sentadilla bulgara con mancuernas','Peso muerto rumano','Zancadas largas con barra','Step-up con lastre','Sentadilla sumo profunda','Good morning gluteo','Puente gluteos con barra','Zancadas laterales con mancuernas','Hip hinge con kettlebell','Sentadilla goblet profunda','Sentadilla sumo con mancuerna','Peso muerto sumo con mancuerna','Zancadas inversas con barra','Donkey kicks con mancuerna en hueco rodilla','Sentadilla sissy','RDL unilateral con mancuerna','Hip thrust unilateral con mancuerna','Peso muerto una pierna','Swing con kettlebell'],
+    maquina:['Hip thrust maquina','Glute drive maquina','Prensa 45 con pie alto y ancho','Extension cadera maquina','Abductor maquina sentado','Curl femoral foco gluteo tumbado','Sentadilla Smith paso ancho','Prensa sumo maquina','Reverse hyperextension maquina','Maquina patada trasera','Abductor de pie cable maquina','Glute kickback maquina','Prensa unilateral pie alto','Maquina aduccion','Hip extension banco romano','Sentadilla Smith bulgara','Prensa gluteo maquina','Extension cadera unilateral maquina','Gluteo maquina multipower','Curl gluteo maquina'],
+    polea:['Patada trasera polea baja','Patada lateral polea baja','Pull through polea baja','Hip thrust polea baja','Abduccion polea baja','Aduccion polea baja','Donkey kick polea baja','Extension cadera de pie polea baja','Step back polea baja','Patada trasera rodilla doblada polea baja','Hip extension inclinado polea baja','Patada diagonal polea baja','Reverse lunge polea baja','Glute kickback polea baja','RDL polea baja','Patada trasera unilateral polea baja','Hip hinge polea baja','Extension cadera lateral polea baja','Cable pull through polea baja','Kickback con rodilla doblada polea baja'],
+    casa:['Puente de gluteos en suelo','Hip thrust con hombros en sofa','Sentadilla sumo profunda sin peso','Donkey kicks en cuadrupedia','Patada lateral en cuadrupedia','Zancadas sin peso','Step up en escalon','Puente gluteos unilateral en suelo','Sentadilla bulgara en silla','Patada trasera de pie sin peso']
+  },
+  core:{
+    libre:['Crunch abdominal con peso en pecho','Crunch inverso con peso','Crunch bicicleta','Plancha frontal con peso en espalda','Plancha lateral con mancuerna','Russian twist con disco','Elevacion piernas colgado en barra','Rodillas pecho colgado en barra','Ab wheel rollout','Sit-up completo con disco','Dead bug','Pallof press con banda elastica','Windmill con kettlebell','Turkish get-up con kettlebell','Dragon flag en banco','Crunch en banco declinado con peso','Side bend con mancuerna','Crunch de cable sin maquina con banda','Toes to bar en barra','Leg raise en banco'],
+    maquina:['Crunch en maquina','Crunch inverso maquina','Rotacion maquina cables','Crunch declinado banco','Hiperextensiones banco romano con peso','Crunch lateral maquina','Extension espalda maquina con peso','Maquina oblicuos','Crunch asistido maquina','Rotacion torso maquina','Extension lumbar maquina','Maquina abdominales sentado','Ab coaster maquina','Crunch con palancas maquina','Maquina core rotacional','Crunch en maquina con rotacion','Extension lumbar unilateral maquina','Maquina oblicuos lateral','Crunch maquina inclinado','Hiperextension lateral maquina'],
+    polea:['Crunch polea alta con cuerda','Crunch lateral polea alta','Rotacion torso polea media','Pallof press polea media','Crunch invertido polea alta','Woodchop polea alta diagonal','Woodchop polea baja diagonal','Woodchop polea media horizontal','Plancha con tiron polea baja','Stir the pot con polea','Crunch unilateral polea alta','Rotacion anti-lateral polea media','Crunch de pie polea alta','Elevacion rodillas polea baja','Rollout con polea baja','Side bend polea baja','Rotacion con barra en polea','Crunch con cuerda polea alta','Torsion polea media','Extension lumbar polea baja'],
+    casa:['Plancha frontal','Crunch abdominal','Crunch bicicleta','Russian twist sin peso','Elevacion piernas en suelo','Mountain climbers','Plancha lateral','Superman en suelo','Sit-up','Dead bug','Hollow body hold','V-ups','Crunch inverso','Plancha con toque de hombro','Crunch oblicuo']
+  }
+};
+
+// VIDEO
+function getVideoUrl(name){return 'https://www.youtube.com/results?search_query='+encodeURIComponent(name+' ejercicio como hacerlo correctamente');}
+
+// EQUIPACIÓN por grupo
+var EQUIPACION={
+  pecho:{calzado:'Cualquier zapatilla con suela plana o deportiva normal. Para el press de banca estás tumbado, así que el calzado no importa demasiado — eso sí, los pies deben apoyarse firmes en el suelo.',ropa:'Camiseta ceñida o sin mangas para no enganchar el agarre con la tela. Pantalón de chándal o mallas cómodas.',accesorios:[{icon:'🧤',name:'Guantes de gym',desc:'Protegen las palmas al agarrar la barra. Útiles si te salen ampollas, aunque muchos prefieren sin ellos.'},'{icon:"💪",name:"Muñequeras",desc:"Para proteger las muñecas en press pesados. Muy recomendables si notas molestias."}',{icon:'🏋️',name:'Cinturón lumbar',desc:'Para series muy pesadas. Solo ponlo en los últimos sets más exigentes — no lo lleves puesto todo el rato.'}]},
+  espalda:{calzado:'Zapatilla de suela plana o bota de levantamiento para el peso muerto. La suela gruesa de running puede hacer que pierdas estabilidad en el peso muerto.',ropa:'Camiseta sin mangas o ceñida. Para remo, evita ropa muy holgada que pueda engancharse.',accesorios:[{icon:'🎯',name:'Straps o correas',desc:'Se enrollan en la barra y te ayudan a no perder el agarre cuando las manos se cansan antes que la espalda. Muy útiles en jalones y remos pesados.'},{icon:'🏋️',name:'Cinturón lumbar',desc:'Imprescindible para peso muerto pesado. Protege la espalda baja.'},{icon:'🧤',name:'Guantes',desc:'Útiles en dominadas para no hacerte rozaduras en las palmas.'}]},
+  hombros:{calzado:'Zapatilla deportiva normal. Para el press militar de pie, una suela plana da más estabilidad.',ropa:'Camiseta sin mangas para ver bien el movimiento de los brazos y no limitar el recorrido.',accesorios:[{icon:'💪',name:'Muñequeras',desc:'Muy recomendables en el press militar pesado. Evitan que las muñecas se doblen hacia atrás.'},{icon:'🔵',name:'Banda de resistencia',desc:'Para el calentamiento y ejercicios de movilidad del hombro. Imprescindibles para cuidar esta articulación tan delicada.'}]},
+  biceps:{calzado:'Cualquier zapatilla. El calzado es irrelevante para la mayoría de ejercicios de bíceps.',ropa:'Camiseta ceñida o sin mangas para ver bien el trabajo del músculo.',accesorios:[{icon:'💪',name:'Muñequeras',desc:'Si haces curl con barra recta y te molestan las muñecas, las muñequeras ayudan mucho.'},{icon:'🎯',name:'Straps',desc:'Para ejercicios en los que el antebrazo se cansa antes que el bíceps — aunque no es lo más habitual.'}]},
+  triceps:{calzado:'Cualquier zapatilla. Para fondos, asegúrate de que el suelo no resbale.',ropa:'Camiseta ceñida. Ropa holgada puede limitar el movimiento en extensiones sobre la cabeza.',accesorios:[{icon:'💪',name:'Muñequeras',desc:'Muy útiles en press francés y press cerrado. Protegen las muñecas de la tensión en extensión.'},{icon:'🧤',name:'Guantes',desc:'Para los fondos con lastre o agarres en polea.'}]},
+  piernas:{calzado:'⚠️ MUY IMPORTANTE: Para sentadillas y peso muerto, usa zapatilla de SUELA PLANA — tipo Converse, Vans, o zapatilla específica de levantamiento (Reebok Legacy, Nike Romaleos). Las zapatillas de running con suela gruesa y blanda hacen que pierdas estabilidad y es más fácil lesionarse. Para sentadilla, hay zapatillas especiales con tacón elevado que ayudan si tienes poca movilidad de tobillo.',ropa:'Pantalón de chándal o mallas elásticas que permitan agacharse completamente. Evita pantalones vaqueros o rígidos.',accesorios:[{icon:'🏋️',name:'Cinturón lumbar',desc:'Imprescindible para sentadillas y peso muerto pesados. Ponlo solo en los sets más exigentes.'},{icon:'🦵',name:'Rodilleras',desc:'Para sentadillas pesadas. Protegen las rodillas y dan calor a la articulación.'},{icon:'🎯',name:'Straps',desc:'Para peso muerto cuando el agarre falla antes que las piernas.'},{icon:'🧦',name:'Medias de levantamiento',desc:'Para peso muerto sumo — protegen las espinillas del roce de la barra.'}]},
+  gluteos:{calzado:'Suela plana para hip thrust y sentadillas. Para ejercicios en máquina o polea, cualquier zapatilla vale.',ropa:'Mallas elásticas que no limiten el movimiento de cadera. Muy importante para poder agacharse y hacer el rango completo.',accesorios:[{icon:'🔵',name:'Banda de resistencia en rodillas',desc:'Imprescindible para activar glúteo medio en sentadillas y puentes. Ponla justo por encima de las rodillas.'},{icon:'🏋️',name:'Cinturón de hip thrust',desc:'Una almohadilla o foam roller debajo de la barra en el hip thrust para que no duela en las caderas.'},{icon:'🎯',name:'Straps',desc:'Para hip thrust muy pesados donde la barra rueda y cuesta sostener.'}]},
+  core:{calzado:'Cualquier zapatilla o directamente descalzo si el suelo lo permite — es más cómodo para muchos ejercicios en suelo.',ropa:'Ropa ceñida para ver la posición del cuerpo. En plancha, ropa holgada puede engañarte sobre si estás recto.',accesorios:[{icon:'🧘',name:'Esterilla o colchoneta',desc:'Imprescindible para ejercicios en suelo. Protege la espalda y la cadera.'},{icon:'🔵',name:'Rueda de abdominales',desc:'Para el ab wheel rollout — uno de los mejores ejercicios de core que existen.'},{icon:'💿',name:'Disco de peso',desc:'Para aumentar la dificultad de crunches y russian twists.'}]}
+};
+
+// CONTENIDO
+function getContent(name,group,equip,level){
+  var DB_CONTENT={
+    'Press banca plano con barra':{mp:['Pectoral mayor'],ms:['Hombro frontal','Tríceps'],nivel:'Principiante',calzado:'Cualquier zapatilla. Los pies deben estar planos en el suelo.',tecnica:['Túmbate en el banco boca arriba. Los pies bien apoyados en el suelo, la espalda pegada al banco.','Agarra la barra con las manos un poco más separadas que los hombros. Las palmas mirando hacia los pies.','Baja la barra despacio hasta tocar el pecho a la altura de los pezones. No la dejes caer.','Empuja la barra hacia arriba hasta casi estirar los brazos. No los bloquees del todo.','Repite. Baja siempre despacio — no rebotes la barra en el pecho.'],consejos:['Junta los omóplatos como si quisieras apretar algo entre ellos — así protegés los hombros.','Los pies siempre en el suelo y firmes — es tu base de apoyo.','Una pequeña curva en la espalda baja es normal y correcta.'],errores:['Rebotar la barra en el pecho para ayudarte a subir — bájala siempre controlada.','Levantar los pies del suelo — pierdes toda la base.']},
+    'Press banca inclinado con barra':{mp:['Pectoral superior','Hombro frontal'],ms:['Tríceps'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Sube el respaldo del banco para que quede inclinado unos 30-40 grados — imagina una tumbona de playa, no demasiado vertical.','Siéntate y apoya toda la espalda. Los pies en el suelo.','Agarra la barra con las manos algo más separadas que los hombros.','Baja la barra despacio hacia la parte alta del pecho — cerca del cuello, no al centro.','Empuja hacia arriba y repite. No inclines el banco más de 45 grados o ya trabajará más el hombro que el pecho.'],consejos:['30-40 grados es el ángulo ideal para el pecho superior. Más inclinado ya es hombro.','Junta los omóplatos durante todo el movimiento.','Baja siempre controlado.'],errores:['Poner el banco casi vertical — ya no es pecho, es hombro.','Dejar caer la barra sin control.']},
+    'Press banca declinado con barra':{mp:['Pectoral inferior'],ms:['Tríceps','Hombro frontal'],nivel:'Intermedio',calzado:'Cualquier zapatilla. Los tobillos se sujetan en los apoyos del banco.',tecnica:['Baja el respaldo del banco para que quede declinado — la cabeza queda más baja que los pies. Mete los tobillos en los apoyos para no resbalar.','Agarra la barra con las manos algo más separadas que los hombros.','Baja la barra hacia la parte baja del pecho — por debajo de los pezones.','Empuja hacia arriba y repite.','Cuidado al recolocar la barra al terminar — pide ayuda si el peso es grande.'],consejos:['El banco declinado trabaja la parte de abajo del pecho — la que da profundidad.','No pongas el banco muy inclinado — con 15-30 grados es suficiente.','Ten siempre a alguien cerca para ayudarte si el peso se atasca.'],errores:['Poner el banco muy declinado — pierdes estabilidad y es peligroso.','No sujetar bien los tobillos antes de empezar.']},
+    'Press banca plano con mancuernas':{mp:['Pectoral mayor'],ms:['Hombro frontal','Tríceps'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Siéntate al borde del banco con una mancuerna en cada mano apoyadas en los muslos.','Recuéstate hacia atrás llevando las mancuernas a los lados del pecho, codos doblados.','Empuja las mancuernas hacia arriba hasta casi estirar los brazos.','Baja despacio sintiendo el estiramiento del pecho.','Las muñecas siempre rectas — no las dobles hacia atrás.'],consejos:['Las mancuernas permiten bajar más que la barra — aprovéchalo para estirar mejor.','No juntes las mancuernas del todo arriba — mantén la tensión en el pecho.','Baja siempre despacio.'],errores:['Dejar caer las mancuernas de golpe — muy peligroso para los hombros.','Doblar las muñecas hacia atrás al empujar.']},
+    'Aperturas banco plano con mancuernas':{mp:['Pectoral mayor'],ms:['Hombro frontal'],nivel:'Intermedio',calzado:'Cualquier zapatilla.',tecnica:['Túmbate en el banco con una mancuerna en cada mano, brazos casi estirados arriba del pecho.','Mantén los codos ligeramente doblados — ese ángulo NO cambia en ningún momento.','Abre los brazos hacia los lados como si abrazaras un árbol gigante, bajando hasta notar el estiramiento.','Vuelve a juntar las mancuernas arriba siguiendo el mismo arco del abrazo.','Para cuando notes tensión en el hombro — no bajes más de lo que el cuerpo pide.'],consejos:['Imagina siempre que abrazas un árbol — ese es el movimiento exacto.','Usa poco peso — el objetivo es sentir el estiramiento, no cargar mucho.','El codo siempre igual de doblado — si lo estiras, se convierte en press.'],errores:['Estirar los codos al bajar — eso convierte el ejercicio en un press.','Usar demasiado peso y no poder controlar la bajada.']},
+    'Aperturas banco inclinado con mancuernas':{mp:['Pectoral superior'],ms:['Hombro frontal'],nivel:'Intermedio',calzado:'Cualquier zapatilla.',tecnica:['Sube el banco a unos 30-40 grados — como una tumbona de playa.','Coge una mancuerna en cada mano con los brazos casi estirados arriba.','Mantén los codos ligeramente doblados — igual que en las aperturas planas.','Abre los brazos hacia los lados y hacia abajo hasta notar el estiramiento en la parte alta del pecho.','Vuelve a juntar siguiendo el mismo arco.'],consejos:['La inclinación del banco hace que trabaje la parte de arriba del pecho.','El movimiento es igual que las aperturas planas, solo cambia el ángulo del banco.','Poco peso y mucho control.'],errores:['Estirar los codos durante el movimiento.','Abrir los brazos demasiado y forzar el hombro.']},
+    'Dips en paralelas':{mp:['Pectoral inferior','Tríceps'],ms:['Hombro frontal'],nivel:'Intermedio',calzado:'Cualquier zapatilla.',tecnica:['Agárrate a las dos barras paralelas y apóyate con los brazos estirados, cuerpo en el aire.','Inclínate hacia adelante — así trabajará el pecho. Si te quedas recto, trabajará el tríceps.','Baja el cuerpo doblando los codos hasta que los hombros queden por debajo de los codos.','Sube empujando hacia arriba hasta casi estirar los brazos.','Repite sin balancear el cuerpo.'],consejos:['Inclinado hacia adelante = más pecho. Recto = más tríceps. Decide qué quieres trabajar.','Si es muy difícil, usa una banda elástica gruesa enganchada a la barra para ayudarte.','Cuando ya te quede fácil, cuelga un disco en un cinturón especial.'],errores:['No inclinarte hacia adelante si quieres trabajar el pecho.','Bajar demasiado — puede forzar el hombro si no tienes movilidad suficiente.']},
+    'Cruce poleas alto':{mp:['Pectoral inferior'],ms:['Hombro frontal'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Pon las poleas en la posición más ALTA de todo — en lo alto de la máquina. Agarra una asa en cada mano.','Da un paso al frente para que los cables estén tensos. Inclínate ligeramente hacia adelante.','Baja los brazos hacia el centro cruzándolos ligeramente, como si abrazaras algo.','Aguanta un momento con el pecho apretado y vuelve hacia atrás de forma controlada.','Los codos siempre ligeramente doblados — ese ángulo no cambia.'],consejos:['Polea ARRIBA del todo = trabaja la parte de ABAJO del pecho. Cuanto más alta la polea, más pecho inferior.','Mantén los codos siempre un poco doblados — nunca completamente estirados.','Alterna el brazo que queda encima en cada repetición.'],errores:['Abrir demasiado los brazos hacia atrás.','Ponerte muy recto sin inclinarte un poco hacia adelante.']},
+    'Cruce poleas bajo':{mp:['Pectoral superior'],ms:['Hombro frontal'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Pon las poleas en la posición más BAJA — casi en el suelo. Agarra una asa en cada mano.','Da un paso al frente y erguido. Los brazos van hacia arriba y al centro.','Sube los brazos hacia el centro cruzándolos ligeramente, como si hicieras un abrazo hacia arriba.','Aguanta un momento y vuelve abajo de forma controlada.','Los codos siempre ligeramente doblados.'],consejos:['Polea ABAJO = trabaja la parte de ARRIBA del pecho. Al revés que el cruce alto.','El movimiento es hacia arriba — no hacia adelante.','Usa poco peso para hacer el movimiento correcto.'],errores:['Doblar los codos al subir — el ángulo del codo no cambia.','No controlar el regreso hacia abajo.']},
+    'Cruce poleas medio':{mp:['Pectoral mayor toda la zona'],ms:['Hombro frontal'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Pon las poleas a la altura media — a la altura de los hombros aproximadamente.','Da un paso al frente con los brazos abiertos en cruz, codos ligeramente doblados.','Lleva ambos brazos hacia el centro al mismo tiempo, como cerrando un abrazo.','Cruza ligeramente las manos al llegar al centro y aguanta un momento.','Vuelve abriendo de forma controlada.'],consejos:['La polea a la altura de los hombros trabaja todo el pectoral de forma equilibrada.','Este es el cruce más completo de los tres — ideal si solo vas a hacer uno.','Poco peso y mucho control del movimiento.'],errores:['Abrir los brazos demasiado al volver.','Usar demasiado impulso del cuerpo.']},
+    'Peso muerto convencional':{mp:['Isquiotibiales','Glúteos','Espalda baja'],ms:['Cuádriceps','Trapecios','Dorsales','Abdomen'],nivel:'Principiante',calzado:'⚠️ MUY IMPORTANTE: Zapatilla de SUELA PLANA — Converse, Vans o zapatilla de levantamiento. NUNCA zapatillas de running con suela gruesa porque pierdes estabilidad y es peligroso.',tecnica:['Ponte de pie con los pies separados al ancho de las caderas. La barra en el suelo, justo encima del mediopié — ni demasiado cerca ni demasiado lejos.','Agáchate doblando rodillas y caderas, agarra la barra con las manos justo fuera de las piernas.','Aprieta el abdomen fuerte, saca el pecho y mira hacia adelante.','Empuja el suelo hacia abajo con los pies mientras subes — como si quisieras hundir el suelo.','Sube manteniendo la barra pegada a las piernas todo el rato. Al llegar arriba, estira las caderas hacia adelante apretando los glúteos.'],consejos:['Piensa en "empujar el suelo" en lugar de "tirar de la barra" — activa mucho mejor los glúteos.','La barra siempre pegada al cuerpo — si se aleja, la espalda sufre el doble.','Si la espalda se redondea, el peso es demasiado — bájalo.'],errores:['Redondear la espalda al tirar — el error más peligroso de todo el gym.','Separar la barra del cuerpo durante la subida.']},
+    'Dominadas agarre ancho':{mp:['Dorsal ancho','Redondo mayor'],ms:['Bíceps','Romboides'],nivel:'Intermedio',calzado:'Cualquier zapatilla.',tecnica:['Agárrate a la barra con las manos más separadas que los hombros, palmas mirando hacia adelante.','Cuelga con los brazos totalmente estirados. Aprieta el abdomen.','Hunde los hombros hacia abajo — como metiéndolos en los bolsillos. Luego dobla los codos tirando hacia arriba.','Sube hasta que la barbilla supere la barra.','Baja despacio y del todo — estira los brazos completamente antes de la siguiente repetición.'],consejos:['Hunde los hombros antes de doblar los codos — así la espalda trabaja más y los hombros sufren menos.','Si no puedes hacer ninguna, usa una goma elástica gruesa enganchada a la barra para ayudarte.','La bajada lenta es tan importante como la subida — no la ignores.'],errores:['Balancearse para subir — el movimiento tiene que ser limpio.','No bajar del todo — si no estiras los brazos, pierdes la mitad del ejercicio.']},
+    'Remo con barra pronado':{mp:['Dorsal ancho','Romboides'],ms:['Bíceps','Hombro posterior'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['De pie, dobla un poco las rodillas e inclínate hacia adelante hasta que el torso quede casi horizontal — como si hicieras una reverencia.','Agarra la barra con las palmas mirando hacia el suelo, manos al ancho de los hombros.','Tira de la barra hacia el abdomen llevando los codos hacia atrás.','Aprieta los omóplatos al llegar arriba y aguanta 1 segundo.','Baja la barra despacio hasta estirar los brazos del todo.'],consejos:['El torso quieto — no te levantes para ayudarte a tirar.','Lleva los codos bien hacia atrás — si no, no aprietas bien la espalda.','Palmas hacia el suelo = más espalda. Palmas hacia arriba = más bíceps.'],errores:['Levantarte con el torso al tirar.','No llevar los codos suficientemente hacia atrás.']},
+    'Face pull polea cuerda':{mp:['Hombro posterior','Romboides'],ms:['Manguito rotador','Bíceps'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Coloca la polea a la altura de tu cara exactamente — ni más alta ni más baja. Pon la cuerda como accesorio.','Agarra cada extremo de la cuerda con una mano. Da un paso atrás hasta que los cables estén tensos.','Tira de la cuerda hacia tu cara separando los extremos mientras llevas los codos hacia atrás.','Al final, los pulgares apuntan hacia atrás y los codos están a la altura de los hombros o por encima.','Vuelve hacia adelante de forma controlada.'],consejos:['Este ejercicio cuida mucho el hombro — hazlo siempre con poco peso.','La polea tiene que estar exactamente a la altura de la cara — si está demasiado alta o baja, cambia el ejercicio.','Puedes hacerlo todos los días porque no fatiga mucho.'],errores:['Poner demasiado peso y perder la forma.','No llevar los codos suficientemente hacia atrás.']},
+    'Press militar barra de pie':{mp:['Hombro frontal','Hombro lateral'],ms:['Tríceps','Trapecio','Abdomen'],nivel:'Principiante',calzado:'Zapatilla de suela plana — da más estabilidad cuando empujas hacia arriba de pie.',tecnica:['De pie, agarra la barra a la altura de la clavícula con las manos al ancho de los hombros o un poco más.','Aprieta el abdomen y los glúteos para que la espalda no se arquee.','Empuja la barra hacia arriba pasándola por delante de la cara.','Cuando los brazos estén arriba, mete la cabeza un poquito hacia adelante para que quede bajo la barra.','Baja la barra despacio hasta la posición de salida.'],consejos:['El abdomen apretado todo el rato — si la espalda se arquea hacia atrás, el peso es demasiado.','Las muñecas rectas — no las dobles hacia atrás al empujar.','De pie activa más el core que sentado — más difícil pero más completo.'],errores:['Arquear la espalda hacia atrás para poder subir la barra.','No estirar los brazos del todo arriba.']},
+    'Elevaciones laterales mancuernas':{mp:['Hombro lateral'],ms:['Hombro frontal','Trapecio'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['De pie o sentado con una mancuerna en cada mano colgando a los lados. Codos ligeramente doblados.','Sube los brazos hacia los lados como alas de pájaro hasta que queden paralelos al suelo — no más arriba.','Al llegar arriba, el meñique debe estar un pelín más alto que el pulgar — como si vaciaras una botella.','Baja despacio — no dejes caer las mancuernas.','El cuerpo quieto todo el rato — no te balancees.'],consejos:['Poco peso — es un músculo pequeño y con mucho peso la forma se arruina.','Para 1 segundo arriba para sentir mejor la contracción.','Si los hombros suben hacia las orejas, el peso es demasiado.'],errores:['Balancearte para subir las mancuernas.','Subir los brazos por encima del paralelo — no hace falta y puede molestar el hombro.']},
+    'Press Arnold con mancuernas':{mp:['Hombro frontal','Hombro lateral','Hombro posterior'],ms:['Tríceps','Trapecio'],nivel:'Intermedio',calzado:'Cualquier zapatilla.',tecnica:['Siéntate con una mancuerna en cada mano a la altura del pecho. Las palmas mirando HACIA TI al empezar — como el final de un curl.','Empieza a empujar hacia arriba mientras giras las muñecas poco a poco.','Al llegar arriba, las palmas deben mirar hacia ADELANTE — al contrario de como empezaron.','Al bajar, gira de nuevo hasta que las palmas miren hacia ti otra vez al llegar abajo.','La rotación ocurre durante todo el recorrido — no de golpe al principio.'],consejos:['El giro de muñecas activa las tres partes del hombro — es uno de los ejercicios de hombro más completos.','Hazlo fluido — no lo dividas en dos movimientos separados.','Apoya la espalda en el respaldo si lo tienes.'],errores:['Girar las muñecas solo al principio y no durante todo el movimiento.','Arquear la espalda al empujar.']},
+    'Curl barra recta':{mp:['Bíceps'],ms:['Braquial anterior'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['De pie, agarra la barra con las palmas mirando hacia arriba, manos al ancho de los hombros.','Los codos pegados a los costados — ahí se quedan, no se mueven.','Dobla los codos subiendo la barra hasta la altura del pecho o los hombros.','Aprieta el bíceps arriba y aguanta 1 segundo.','Baja despacio estirando del todo los brazos.'],consejos:['Los codos quietos es lo más importante — si se van hacia adelante, el torso está ayudando.','Baja siempre hasta estirar del todo los brazos.','La bajada lenta es cuando más crece el músculo — no la ignores.'],errores:['Balancear el torso hacia adelante y atrás para subir la barra.','No bajar del todo los brazos.']},
+    'Curl alterno mancuernas':{mp:['Bíceps'],ms:['Braquial anterior'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['De pie o sentado con una mancuerna en cada mano, brazos estirados a los lados.','Sube una mancuerna doblando el codo y girando la muñeca para que la palma mire hacia arriba al llegar.','Sube hasta la altura del hombro y aprieta el bíceps.','Baja despacio y repite con el otro brazo.','Los codos siempre quietos a los costados.'],consejos:['El giro de la muñeca al subir activa mejor el bíceps.','Trabajar un brazo solo te permite concentrarte más en él.','Baja hasta estirar el brazo del todo.'],errores:['Mover los codos hacia adelante al subir.','Balancear el cuerpo para ayudarte.']},
+    'Curl martillo con mancuernas':{mp:['Braquiorradial','Braquial anterior'],ms:['Bíceps'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['De pie con una mancuerna en cada mano. El pulgar apunta hacia arriba — como un martillo.','Dobla los codos subiendo la mancuerna sin girar la muñeca en ningún momento.','Sube hasta la altura del hombro y baja despacio.','Los codos siempre pegados al cuerpo.','Puedes hacerlo con los dos brazos a la vez o alternándolos.'],consejos:['Este agarre trabaja más el antebrazo y el músculo debajo del bíceps.','Es más suave para las muñecas que el curl con barra recta.','Completa muy bien los curls normales.'],errores:['Girar la muñeca al subir — el pulgar tiene que apuntar arriba todo el rato.','Mover los codos hacia adelante.']},
+    'Press frances con barra EZ':{mp:['Tríceps'],ms:['Ancóneo'],nivel:'Intermedio',calzado:'Cualquier zapatilla.',tecnica:['Túmbate en el banco boca arriba. Agarra la barra EZ — esa con forma de zigzag — con las manos juntas en el agarre interior.','Estira los brazos por encima del pecho. Los codos apuntan ligeramente hacia la cabeza.','Dobla solo los codos bajando la barra hacia la frente — o un pelín por encima.','Estira de nuevo los codos volviendo arriba.','Los codos juntos y apuntando al techo durante todo el movimiento — no los abras.'],consejos:['La barra en Z o EZ es más cómoda para las muñecas que la barra recta.','Si bajas la barra más hacia atrás de la cabeza, trabaja más la parte de atrás del tríceps.','Los codos juntos siempre — si se abren, el tríceps trabaja menos.'],errores:['Abrir los codos hacia los lados al bajar.','Bajar la barra sin control.']},
+    'Pushdown polea alta con cuerda':{mp:['Tríceps'],ms:['Ancóneo'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Pon la cuerda en la polea de lo más ALTO de la máquina. De pie frente a la máquina.','Agarra los dos extremos de la cuerda con las palmas enfrentadas. Los codos doblados a 90 grados.','Empuja hacia abajo estirando los codos. Al llegar al final, separa los extremos de la cuerda hacia afuera.','Las palmas miran hacia el suelo al llegar abajo y los pulgares apuntan hacia afuera.','Vuelve arriba de forma controlada sin levantar los codos.'],consejos:['La polea tiene que estar arriba del todo — si está baja, cambia el ejercicio.','Separar la cuerda al llegar abajo es lo que aprieta más el tríceps.','Los codos fijos a los lados — no los levantes al volver arriba.'],errores:['Levantar los codos al volver arriba.','Usar el cuerpo para empujar en lugar del tríceps.']},
+    'Extension con una mancuerna sobre cabeza':{mp:['Tríceps parte posterior'],ms:['Tríceps'],nivel:'Principiante',calzado:'Cualquier zapatilla.',tecnica:['Sentado o de pie, agarra una mancuerna con las dos manos por debajo del disco de arriba.','Sube la mancuerna por encima de la cabeza con los brazos casi estirados.','Dobla los codos bajando la mancuerna por detrás de la cabeza — los codos apuntan al techo.','Estira de nuevo los codos volviendo arriba.','Los codos siempre juntos — no los abras hacia los lados.'],consejos:['Este ejercicio trabaja especialmente la parte de atrás del tríceps — la que da más volumen al brazo.','Los codos juntos siempre — si se abren, pierde efectividad.','Apoya la espalda en un respaldo si puedes.'],errores:['Abrir los codos hacia los lados.','Arquear la espalda al estirar los brazos arriba.']},
+    'Sentadilla barra trasera':{mp:['Cuádriceps','Glúteos','Isquiotibiales'],ms:['Aductores','Abdomen','Espalda baja'],nivel:'Principiante',calzado:'⚠️ MUY IMPORTANTE: Zapatilla de SUELA PLANA — Converse, Vans o zapatilla de levantamiento. Las zapatillas de running con suela blanda hacen que pierdas equilibrio y es fácil lesionarse. Si tienes poca movilidad de tobillo y los talones se levantan, puedes poner una pequeña cuña debajo de los talones.',tecnica:['Pon la barra sobre la parte alta de la espalda — justo encima de los hombros.','Los pies separados al ancho de los hombros o un poco más. Las puntas ligeramente abiertas hacia afuera.','Aprieta el abdomen y baja como si fueras a sentarte en una silla muy baja, llevando las rodillas en la misma dirección que los pies.','Baja hasta que los muslos queden paralelos al suelo — o más abajo si puedes.','Sube empujando el suelo con los pies. El pecho siempre alto.'],consejos:['Las rodillas siempre apuntando hacia los pies — si colapsan hacia adentro, para.','El pecho alto y la mirada hacia adelante — si miras al suelo, la espalda se redondea.','Si los talones se levantan, prueba a abrir más las puntas de los pies.'],errores:['Las rodillas que se van hacia adentro al subir — el error más común.','Redondear la espalda baja al fondo de la sentadilla.']},
+    'Peso muerto rumano':{mp:['Isquiotibiales','Glúteos'],ms:['Espalda baja','Aductores'],nivel:'Principiante',calzado:'Zapatilla de suela plana. Igual que en el peso muerto convencional.',tecnica:['De pie con los pies al ancho de las caderas. La barra o mancuernas delante de ti.','Empuja las caderas hacia ATRÁS manteniendo las rodillas casi rectas — solo un pelín dobladas.','Baja las pesas siguiendo el perfil de las piernas hasta notar el estiramiento detrás de los muslos.','La espalda siempre recta — cuando se doble, has llegado a tu límite.','Vuelve arriba empujando las caderas hacia adelante y apretando los glúteos.'],consejos:['Nota el estiramiento detrás de los muslos — cuando desaparezca o la espalda se curve, para.','El movimiento es como cerrar un cajón con las caderas — hacia atrás y hacia adelante.','Las rodillas casi rectas — si las doblas mucho, se convierte en sentadilla.'],errores:['Redondear la espalda baja al bajar.','Doblar demasiado las rodillas.']},
+    'Prensa piernas 45 grados':{mp:['Cuádriceps','Glúteos'],ms:['Isquiotibiales','Aductores'],nivel:'Principiante',calzado:'Cualquier zapatilla. Los pies van en la plataforma de la máquina.',tecnica:['Siéntate en la máquina con la espalda y las nalgas bien apoyadas en el asiento.','Pon los pies en la plataforma al ancho de los hombros — ni muy arriba ni muy abajo.','Suelta los seguros de seguridad y baja la plataforma doblando las rodillas de forma controlada.','Baja hasta que las rodillas formen un ángulo de unos 90 grados.','Empuja la plataforma hacia arriba con los pies hasta casi estirar las rodillas — NUNCA las bloquees del todo.'],consejos:['Pies arriba y separados en la plataforma = más glúteos. Pies bajos y juntos = más cuádriceps.','Nunca bloquees las rodillas del todo al empujar — puede hacerles daño.','Las rodillas siempre apuntando en la misma dirección que los pies.'],errores:['Las rodillas que colapsan hacia adentro al empujar.','Las nalgas que se levantan del asiento — así la espalda baja trabaja de más.']},
+    'Hip thrust con barra':{mp:['Glúteos'],ms:['Isquiotibiales','Abdomen'],nivel:'Principiante',calzado:'Cualquier zapatilla o descalzo.',tecnica:['Apoya la parte alta de la espalda en un banco — solo los hombros y la espalda alta, no toda la espalda.','Coloca la barra sobre las caderas. Pon una almohadilla, toalla enrollada o foam roller debajo para que no duela.','Baja las caderas hacia el suelo.','Empuja las caderas hacia arriba apretando los glúteos con mucha fuerza hasta que el cuerpo quede recto.','Aprieta los glúteos arriba durante 1-2 segundos antes de bajar.'],consejos:['Este es el mejor ejercicio para los glúteos — no lo saltes.','La almohadilla debajo de la barra es muy importante — sin ella duele mucho en las caderas.','Mete la barbilla hacia el pecho para no forzar el cuello.'],errores:['No llegar arriba del todo con las caderas — el glúteo no se contrae bien.','Las rodillas que caen hacia adentro al empujar.']},
+    'Plancha frontal':{mp:['Abdomen','Transverso del abdomen'],ms:['Oblicuos','Glúteos','Cuádriceps'],nivel:'Principiante',calzado:'Cualquier zapatilla o descalzo.',tecnica:['Apóyate sobre los antebrazos y los dedos de los pies. Los codos justo debajo de los hombros.','El cuerpo forma una línea recta de la cabeza a los talones — como una tabla.','Aprieta el abdomen, los glúteos y los muslos.','La cabeza mirando al suelo — no la levantes.','Respira durante todo el tiempo que aguantes.'],consejos:['Si es muy difícil al principio, apoya las rodillas en lugar de los pies.','Empieza con 20-30 segundos e incrementa poco a poco.','Si las caderas caen o suben, corrígelo inmediatamente.'],errores:['Las caderas que caen hacia el suelo.','Las caderas que suben demasiado formando una pirámide.']},
+    'Crunch abdominal con peso en pecho':{mp:['Recto abdominal'],ms:['Oblicuos'],nivel:'Principiante',calzado:'Cualquier zapatilla o descalzo. Mejor en colchoneta.',tecnica:['Túmbate boca arriba con las rodillas dobladas y los pies en el suelo. Sujeta el peso en el pecho.','Sube los hombros del suelo curvando la espalda hacia arriba — solo los hombros, la espalda baja no se mueve.','El cuello relajado — no lo fuerces.','Aguanta un momento arriba y baja despacio.','Exhala al subir — ayuda a contraer mejor el abdomen.'],consejos:['El movimiento es pequeño — no te incorpores del todo.','Baja siempre despacio.','Sin peso primero hasta dominar la técnica, luego añade.'],errores:['Tirar del cuello para subir.','Subir demasiado — el abdomen deja de trabajar al final.']},
+    'Russian twist con disco':{mp:['Oblicuos'],ms:['Abdomen','Psoas'],nivel:'Intermedio',calzado:'Cualquier zapatilla o descalzo.',tecnica:['Siéntate en el suelo con las rodillas dobladas. Inclínate hacia atrás unos 45 grados — como a medio camino de tumbarte.','Agarra el disco o peso con las dos manos frente al pecho.','Gira el cuerpo hacia un lado llevando el peso casi al suelo.','Vuelve al centro y gira hacia el otro lado.','El movimiento viene del cuerpo, no de los brazos.'],consejos:['Levantar los pies del suelo hace el ejercicio más difícil.','Gira todo el cuerpo — no solo muevas los brazos.','Si la espalda se redondea, reduce el ángulo de inclinación.'],errores:['Girar solo los brazos sin girar el torso.','Ir demasiado rápido usando el impulso.']},
+    'Ab wheel rollout':{mp:['Abdomen','Transverso'],ms:['Dorsales','Hombros'],nivel:'Avanzado',calzado:'Descalzo o zapatilla. Usa colchoneta para las rodillas.',tecnica:['Arrodíllate con la rueda de abdominales justo debajo de los hombros.','Aprieta el abdomen muy fuerte y empieza a rodar hacia adelante estirando los brazos.','Llega tan lejos como puedas sin que las caderas bajen ni la espalda se curve.','Vuelve a la posición inicial contrayendo el abdomen.','La espalda recta durante todo el movimiento.'],consejos:['Empieza con poco recorrido e incrementa poco a poco.','Antes de intentarlo, debes poder aguantar la plancha 60 segundos sin problema.','Es uno de los ejercicios de abdomen más exigentes que existen.'],errores:['Las caderas que bajan al extenderse — puede lesionar la espalda.','No apretar el abdomen antes de empezar.']},
+    'Elevacion piernas colgado en barra':{mp:['Abdomen inferior','Psoas'],ms:['Oblicuos'],nivel:'Avanzado',calzado:'Cualquier zapatilla.',tecnica:['Cuélgate de una barra con las manos al ancho de los hombros y las palmas hacia adelante.','Aprieta el abdomen.','Sube las piernas llevando las rodillas hacia el pecho — versión fácil.','O sube las piernas rectas hasta el nivel de las manos — versión difícil.','Baja de forma completamente controlada sin balancearte.'],consejos:['Empieza con rodillas dobladas y cuando te resulte fácil, pasa a piernas rectas.','Si te balanceas, usa el abdomen para frenarte.','Exhala al subir.'],errores:['Balancearse para ayudarse a subir.','Dejar caer las piernas de golpe al bajar.']}
+  };
+  if(DB_CONTENT[name]) return DB_CONTENT[name];
+  var gData={
+    pecho:{mp:['Pectoral mayor'],ms:['Hombro frontal','Tríceps'],tecnica:['Adopta la posición inicial con la espalda apoyada y los pies en el suelo.','Coloca las manos en la posición correcta para el ejercicio.','Ejecuta el movimiento de forma controlada sintiendo el trabajo en el pecho.','Lleva el movimiento hasta el rango completo.','Regresa a la posición inicial de forma controlada.'],calzado:'Cualquier zapatilla.'},
+    espalda:{mp:['Dorsal ancho','Trapecios'],ms:['Bíceps','Romboides'],tecnica:['Adopta la posición con la espalda en posición neutra.','Hunde los hombros hacia abajo antes de empezar el movimiento.','Tira del peso hacia el cuerpo llevando los codos hacia atrás.','Contrae la espalda en el punto de máxima contracción.','Regresa de forma controlada.'],calzado:'Zapatilla plana para ejercicios de pie. Cualquier zapatilla para los demás.'},
+    hombros:{mp:['Deltoides'],ms:['Trapecios','Manguito rotador'],tecnica:['Adopta la posición con los pies estables y el abdomen apretado.','Mantén los codos en la posición correcta.','Ejecuta el movimiento sin usar el impulso del cuerpo.','Llega al rango completo.','Controla el regreso.'],calzado:'Cualquier zapatilla.'},
+    biceps:{mp:['Bíceps'],ms:['Braquial anterior'],tecnica:['Mantén los codos fijos a los costados durante todo el movimiento.','Dobla el codo subiendo el peso hacia el hombro.','Gira la muñeca si procede para maximizar la activación.','Contrae el bíceps arriba y aguanta 1 segundo.','Baja de forma completamente controlada.'],calzado:'Cualquier zapatilla.'},
+    triceps:{mp:['Tríceps'],ms:['Ancóneo'],tecnica:['Posiciona los codos correctamente según el ejercicio.','Estira los codos de forma controlada.','Llega a la extensión completa.','Aguanta 1 segundo en el punto de máxima contracción.','Regresa flexionando los codos de forma controlada.'],calzado:'Cualquier zapatilla.'},
+    piernas:{mp:['Cuádriceps','Glúteos'],ms:['Core','Aductores'],tecnica:['Adopta la posición con los pies al ancho correcto y el abdomen apretado.','Mantén el pecho alto y las rodillas en línea con los pies.','Ejecuta el movimiento controlado.','Llega al rango de movimiento completo.','Regresa de forma controlada.'],calzado:'⚠️ Zapatilla de SUELA PLANA para ejercicios de pie — Converse, Vans o zapatilla de levantamiento.'},
+    gluteos:{mp:['Glúteo mayor','Glúteo medio'],ms:['Isquiotibiales','Core'],tecnica:['Adopta la posición inicial activando previamente el glúteo.','Ejecuta el movimiento de extensión o abducción de cadera.','Contrae el glúteo de forma intensa en el punto de máxima extensión.','Aguanta 1-2 segundos en la contracción máxima.','Regresa de forma controlada.'],calzado:'Cualquier zapatilla o descalzo.'},
+    core:{mp:['Recto abdominal','Transverso'],ms:['Oblicuos','Psoas'],tecnica:['Activa el abdomen antes de empezar.','Ejecuta el movimiento desde la musculatura abdominal.','Mantén la respiración controlada.','Lleva el movimiento hasta el rango completo.','Regresa de forma controlada sin relajar el abdomen.'],calzado:'Descalzo o cualquier zapatilla. Usa colchoneta.'}
+  };
+  var d=gData[group]||gData.core;
+  return{mp:d.mp,ms:d.ms,nivel:level,calzado:d.calzado,tecnica:d.tecnica,consejos:['Mantén siempre la espalda en posición neutra.','Controla la fase de regreso para maximizar los resultados.','Usa un peso que te permita hacer el movimiento con buena técnica.'],errores:['Usar demasiado peso y perder la técnica correcta.','No controlar la fase de regreso del movimiento.']};
+}
+
+var grp='pecho',equip='libre',level='Todos',view='ejercicios',selEx=null;
+var miRutina=JSON.parse(localStorage.getItem('hsb_rutina')||'[]');
+
+function saveRutina(){try{localStorage.setItem('hsb_rutina',JSON.stringify(miRutina));}catch(e){}}
+function isInRutina(name){return miRutina.some(function(r){return r.name===name;});}
+function toggleRutina(name,group){
+  if(isInRutina(name)){miRutina=miRutina.filter(function(r){return r.name!==name;});}
+  else{miRutina.push({name:name,group:group,equip:equip});}
+  saveRutina();renderList();
+  if(view==='rutina')renderRutina();
+}
+
+function getAnatomy(group){
+  var v=VIEW_MAP[group];
+  var R='#d4001a',S='#c8a070',SD='#a07848',SL='#e0c090',LN='#8a6050';
+  function af(z){var m={pecho:['pec'],espalda:[],hombros:['df','dl'],biceps:['bic'],triceps:[],piernas:['quad','calf'],gluteos:[],core:['abs','obl']};return(m[group]||[]).indexOf(z)!==-1;}
+  function ab(z){var m={pecho:[],espalda:['trap','lat','lb'],hombros:['dlb','dp'],biceps:[],triceps:['tri'],piernas:['ham','cb','gb'],gluteos:['gb','ham'],core:['lb']};return(m[group]||[]).indexOf(z)!==-1;}
+  function ff(z){return af(z)?R:S;} function fs(z){return af(z)?'#a32d2d':LN;}
+  function bf(z){return ab(z)?R:S;} function bs(z){return ab(z)?'#a32d2d':LN;}
+  var front='<svg viewBox="0 0 140 340" width="62" height="151"><defs><radialGradient id="hgfa" cx="50%" cy="40%"><stop offset="0%" stop-color="'+SL+'"/><stop offset="100%" stop-color="'+S+'"/></radialGradient></defs><ellipse cx="70" cy="20" rx="15" ry="18" fill="url(#hgfa)" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="63" cy="18" rx="2.5" ry="2" fill="#5a3828" opacity="0.7"/><ellipse cx="77" cy="18" rx="2.5" ry="2" fill="#5a3828" opacity="0.7"/><path d="M63,36 Q67,40 70,40 Q73,40 77,36 L76,46 Q73,48 70,48 Q67,48 64,46Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M64,46 Q56,50 48,56 L52,60 Q60,54 70,52 Q80,54 88,60 L92,56 Q84,50 76,46Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="42" cy="66" rx="11" ry="10" transform="rotate(-10,42,66)" fill="'+ff('df')+'" stroke="'+fs('df')+'" stroke-width="0.9"/><ellipse cx="98" cy="66" rx="11" ry="10" transform="rotate(10,98,66)" fill="'+ff('df')+'" stroke="'+fs('df')+'" stroke-width="0.9"/><ellipse cx="40" cy="72" rx="9" ry="8" fill="'+ff('dl')+'" stroke="'+fs('dl')+'" stroke-width="0.8" opacity="0.8"/><ellipse cx="100" cy="72" rx="9" ry="8" fill="'+ff('dl')+'" stroke="'+fs('dl')+'" stroke-width="0.8" opacity="0.8"/><path d="M52,58 Q61,55 69,59 L69,88 Q61,92 52,86 Q47,78 52,58Z" fill="'+ff('pec')+'" stroke="'+fs('pec')+'" stroke-width="1"/><path d="M71,59 Q79,55 88,58 Q93,78 88,86 Q79,92 71,88 L71,59Z" fill="'+ff('pec')+'" stroke="'+fs('pec')+'" stroke-width="1"/><line x1="70" y1="57" x2="70" y2="90" stroke="'+fs('pec')+'" stroke-width="0.5"/><path d="M57,90 Q63,88 69,90 L69,154 Q63,156 57,154 Q53,140 57,90Z" fill="'+ff('abs')+'" stroke="'+fs('abs')+'" stroke-width="0.8"/><path d="M71,90 Q77,88 83,90 Q87,140 83,154 L71,154 L71,90Z" fill="'+ff('abs')+'" stroke="'+fs('abs')+'" stroke-width="0.8"/><line x1="57" y1="108" x2="83" y2="108" stroke="'+fs('abs')+'" stroke-width="0.6"/><line x1="57" y1="124" x2="83" y2="124" stroke="'+fs('abs')+'" stroke-width="0.6"/><line x1="57" y1="140" x2="83" y2="140" stroke="'+fs('abs')+'" stroke-width="0.6"/><line x1="70" y1="90" x2="70" y2="154" stroke="'+fs('abs')+'" stroke-width="0.6"/><path d="M53,94 Q47,112 49,148 Q54,144 58,132 Q56,114 53,94Z" fill="'+ff('obl')+'" stroke="'+fs('obl')+'" stroke-width="0.8"/><path d="M87,94 Q93,112 91,148 Q86,144 82,132 Q84,114 87,94Z" fill="'+ff('obl')+'" stroke="'+fs('obl')+'" stroke-width="0.8"/><path d="M30,68 Q23,76 23,98 Q26,107 33,107 Q40,107 43,98 Q43,76 36,68Z" fill="'+ff('bic')+'" stroke="'+fs('bic')+'" stroke-width="0.9"/><path d="M97,68 Q104,76 117,98 Q114,107 107,107 Q100,107 97,98 Q97,76 104,68Z" fill="'+ff('bic')+'" stroke="'+fs('bic')+'" stroke-width="0.9"/><path d="M25,108 Q20,118 22,140 Q26,147 33,147 Q40,147 44,140 Q46,118 41,108Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M99,108 Q103,118 118,140 Q114,147 107,147 Q100,147 96,140 Q94,118 99,108Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="31" cy="154" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="109" cy="154" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M53,154 Q62,150 70,152 Q78,150 87,154 Q89,166 70,168 Q51,166 53,154Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.9"/><path d="M53,166 Q44,180 44,216 Q48,234 57,238 Q65,240 68,232 Q73,216 71,188 Q69,172 62,166Z" fill="'+ff('quad')+'" stroke="'+fs('quad')+'" stroke-width="0.9"/><path d="M87,166 Q96,180 96,216 Q92,234 83,238 Q75,240 72,232 Q67,216 69,188 Q71,172 78,166Z" fill="'+ff('quad')+'" stroke="'+fs('quad')+'" stroke-width="0.9"/><ellipse cx="58" cy="242" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="82" cy="242" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M50,252 Q44,265 46,292 Q50,306 58,308 Q66,306 68,292 Q70,265 66,252Z" fill="'+ff('calf')+'" stroke="'+fs('calf')+'" stroke-width="0.9"/><path d="M74,252 Q80,265 94,292 Q90,306 82,308 Q74,306 72,292 Q70,265 74,252Z" fill="'+ff('calf')+'" stroke="'+fs('calf')+'" stroke-width="0.9"/><ellipse cx="59" cy="320" rx="13" ry="6" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="81" cy="320" rx="13" ry="6" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/></svg>';
+  var back='<svg viewBox="0 0 140 340" width="62" height="151"><defs><radialGradient id="hgba" cx="50%" cy="40%"><stop offset="0%" stop-color="'+SL+'"/><stop offset="100%" stop-color="'+S+'"/></radialGradient></defs><ellipse cx="70" cy="20" rx="15" ry="18" fill="url(#hgba)" stroke="'+LN+'" stroke-width="0.8"/><path d="M63,36 Q67,40 70,40 Q73,40 77,36 L76,46 Q73,48 70,48 Q67,48 64,46Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M64,46 Q56,48 48,56 L52,62 Q62,56 70,54 Q78,56 88,62 L92,56 Q84,48 76,46 Q73,52 70,52 Q67,52 64,46Z" fill="'+bf('trap')+'" stroke="'+bs('trap')+'" stroke-width="1"/><path d="M52,62 Q60,72 70,74 Q80,72 88,62 Q80,68 70,70 Q60,68 52,62Z" fill="'+bf('trap')+'" stroke="'+bs('trap')+'" stroke-width="0.8"/><ellipse cx="41" cy="68" rx="11" ry="10" transform="rotate(10,41,68)" fill="'+bf('dlb')+'" stroke="'+bs('dlb')+'" stroke-width="0.9"/><ellipse cx="99" cy="68" rx="11" ry="10" transform="rotate(-10,99,68)" fill="'+bf('dlb')+'" stroke="'+bs('dlb')+'" stroke-width="0.9"/><ellipse cx="40" cy="74" rx="8" ry="7" fill="'+bf('dp')+'" stroke="'+bs('dp')+'" stroke-width="0.8"/><ellipse cx="100" cy="74" rx="8" ry="7" fill="'+bf('dp')+'" stroke="'+bs('dp')+'" stroke-width="0.8"/><path d="M49,64 Q40,82 42,118 Q50,110 56,100 Q54,82 52,64Z" fill="'+bf('lat')+'" stroke="'+bs('lat')+'" stroke-width="1"/><path d="M91,64 Q100,82 98,118 Q90,110 84,100 Q86,82 88,64Z" fill="'+bf('lat')+'" stroke="'+bs('lat')+'" stroke-width="1"/><path d="M56,64 Q64,62 70,64 Q76,62 84,64 Q80,88 70,92 Q60,88 56,64Z" fill="'+bf('trap')+'" stroke="'+bs('trap')+'" stroke-width="0.8" opacity="0.7"/><rect x="60" y="118" width="9" height="38" rx="4" fill="'+bf('lb')+'" stroke="'+bs('lb')+'" stroke-width="0.8"/><rect x="71" y="118" width="9" height="38" rx="4" fill="'+bf('lb')+'" stroke="'+bs('lb')+'" stroke-width="0.8"/><path d="M30,68 Q22,78 22,106 Q26,114 33,113 Q40,112 42,104 Q43,80 36,68Z" fill="'+bf('tri')+'" stroke="'+bs('tri')+'" stroke-width="0.9"/><path d="M98,68 Q108,78 118,106 Q114,114 107,113 Q100,112 98,104 Q97,80 104,68Z" fill="'+bf('tri')+'" stroke="'+bs('tri')+'" stroke-width="0.9"/><path d="M24,114 Q19,124 21,146 Q25,153 33,153 Q41,153 45,146 Q47,124 42,114Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M98,114 Q102,124 119,146 Q115,153 107,153 Q99,153 95,146 Q93,124 98,114Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="31" cy="160" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="109" cy="160" rx="9" ry="10" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><path d="M54,156 Q62,152 70,154 Q78,152 86,156 Q88,168 70,170 Q52,168 54,156Z" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.9"/><path d="M54,168 Q46,176 46,196 Q50,210 62,214 Q70,216 70,210 L70,170Z" fill="'+bf('gb')+'" stroke="'+bs('gb')+'" stroke-width="1"/><path d="M86,168 Q94,176 94,196 Q90,210 78,214 Q70,216 70,210 L70,170Z" fill="'+bf('gb')+'" stroke="'+bs('gb')+'" stroke-width="1"/><line x1="70" y1="170" x2="70" y2="212" stroke="'+bs('gb')+'" stroke-width="0.6"/><path d="M46,208 Q40,222 42,250 Q46,264 56,266 Q64,265 66,256 Q68,240 68,216 Q62,212 54,210Z" fill="'+bf('ham')+'" stroke="'+bs('ham')+'" stroke-width="0.9"/><path d="M94,208 Q100,222 98,250 Q94,264 84,266 Q76,265 74,256 Q72,240 72,216 Q78,212 86,210Z" fill="'+bf('ham')+'" stroke="'+bs('ham')+'" stroke-width="0.9"/><ellipse cx="57" cy="270" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><ellipse cx="83" cy="270" rx="11" ry="8" fill="'+SD+'" stroke="'+LN+'" stroke-width="0.8"/><path d="M48,278 Q42,292 44,316 Q48,328 57,330 Q66,328 68,316 Q70,292 66,278Z" fill="'+bf('cb')+'" stroke="'+bs('cb')+'" stroke-width="0.9"/><path d="M72,278 Q78,292 96,316 Q92,328 83,330 Q74,328 72,316 Q70,292 72,278Z" fill="'+bf('cb')+'" stroke="'+bs('cb')+'" stroke-width="0.9"/><ellipse cx="58" cy="342" rx="13" ry="5.5" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/><ellipse cx="82" cy="342" rx="13" ry="5.5" fill="'+S+'" stroke="'+LN+'" stroke-width="0.7"/></svg>';
+  var html='<div class="anatomy"><div class="anatomy-views">';
+  if(v==='front'||v==='both') html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">'+front+(v==='both'?'<span class="anatomy-label">Frontal</span>':'')+'</div>';
+  if(v==='back'||v==='both') html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;">'+back+(v==='both'?'<span class="anatomy-label">Dorsal</span>':'')+'</div>';
+  html+='</div>';
+  if(v!=='both') html+='<span class="anatomy-label">Vista '+(v==='front'?'frontal':'dorsal')+'</span>';
+  html+='<div class="anatomy-legend"><div class="anatomy-dot"></div><span style="font-size:9px;color:var(--gray3);">Zona activa</span></div></div>';
+  return html;
+}
+
+function renderSidebar(){
+  var sb=document.getElementById('sidebar');
+  var h='<div class="sidebar-label">Grupo muscular</div>';
+  GROUPS.forEach(function(g){h+='<button class="sidebar-btn'+(grp===g.id?' active':'')+'" onclick="setGroup(\''+g.id+'\')" >'+g.label+'</button>';});
+  h+='<div class="sidebar-div"></div><div class="sidebar-label">Equipamiento</div>';
+  EQUIP.forEach(function(e){h+='<button class="sidebar-equip'+(equip===e.id?' active':'')+'" onclick="setEquip(\''+e.id+'\')">'+e.label+'</button>';});
+  h+='<div class="sidebar-div"></div>';
+  h+='<button class="sidebar-special'+(view==='warmup'?' active':'')+'" onclick="setView(\'warmup\')">🔥 Calentamiento</button>';
+  h+='<button class="sidebar-special'+(view==='equipacion'?' active':'')+'" onclick="setView(\'equipacion\')">🎽 Equipación</button>';
+  h+='<button class="sidebar-special'+(view==='rutina'?' active':'')+'" onclick="setView(\'rutina\')">⭐ Mi Rutina</button>';
+  sb.innerHTML=h;
+}
+
+function renderMobileStrip(){
+  var strip=document.getElementById('mobile-strip');
+  var h='';
+  GROUPS.forEach(function(g){h+='<button style="background:'+(grp===g.id?'var(--red)':'#222')+';color:'+(grp===g.id?'#fff':'#aaa')+';border:none;border-radius:20px;padding:5px 12px;cursor:pointer;font-size:11px;font-weight:600;white-space:nowrap;flex-shrink:0;font-family:inherit;" onclick="setGroup(\''+g.id+'\')">'+g.label+'</button>';});
+  h+='<div style="width:1px;background:#333;margin:0 4px;flex-shrink:0;"></div>';
+  EQUIP.forEach(function(e){h+='<button style="background:transparent;color:'+(equip===e.id?'var(--red)':'#888')+';border:1px solid '+(equip===e.id?'var(--red)':'#333')+';border-radius:20px;padding:5px 12px;cursor:pointer;font-size:11px;white-space:nowrap;flex-shrink:0;font-family:inherit;" onclick="setEquip(\''+e.id+'\')">'+e.label+'</button>';});
+  strip.innerHTML=h;
+}
+
+function renderList(){
+  var s=document.getElementById('search');
+  var search=s?s.value.toLowerCase():'';
+  var exs=(DB[grp]&&DB[grp][equip])||[];
+  var wl=exs.map(function(e,i){return{name:e,level:LVL_PAT[i]||'Intermedio'};});
+  var fl=wl.filter(function(e){return(level==='Todos'||e.level===level)&&e.name.toLowerCase().indexOf(search)!==-1;});
+  var lh='';
+  LEVELS.forEach(function(l){
+    var act=level===l;
+    var bg=act?(l==='Todos'?'#333':LVL_BG[l]):'#f0f0f0';
+    var col=act?(l==='Todos'?'#fff':LVL_C[l]):'#888';
+    var bor=act&&l!=='Todos'?'1px solid '+LVL_C[l]+'44':'1px solid transparent';
+    lh+='<button onclick="setLevel(\''+l+'\')" style="font-size:10px;padding:3px 7px;border-radius:20px;border:'+bor+';cursor:pointer;font-family:inherit;font-weight:600;background:'+bg+';color:'+col+';">'+(l==='Todos'?'Todos':l.slice(0,5)+'.')+'</button>';
+  });
+  document.getElementById('levels').innerHTML=lh;
+  document.getElementById('count').textContent=fl.length+' ejercicios';
+  var h='';
+  fl.forEach(function(ex){
+    var act=selEx===ex.name;
+    var lc=LVL_C[ex.level];var lb=LVL_BG[ex.level];
+    var star=isInRutina(ex.name)?'⭐':'☆';
+    var safeName=ex.name.replace(/'/g,'\\\'');
+    h+='<button class="list-item'+(act?' active':'')+'" onclick="showEx(\''+safeName+'\',\''+ex.level+'\')">';
+    h+='<div class="list-item-left"><span>'+ex.name+'</span></div>';
+    h+='<div style="display:flex;align-items:center;gap:4px;">';
+    h+='<span class="list-item-star" onclick="event.stopPropagation();toggleRutina(\''+safeName+'\',\''+grp+'\')" title="Añadir a Mi Rutina">'+star+'</span>';
+    h+='<span class="lvl" style="background:'+(act?'rgba(255,255,255,0.25)':lb)+';color:'+(act?'#fff':lc)+';">'+ex.level.slice(0,3).toUpperCase()+'</span>';
+    h+='</div></button>';
+  });
+  document.getElementById('list-items').innerHTML=h||'<div style="padding:2rem;text-align:center;font-size:13px;color:var(--gray3);">Sin resultados</div>';
+}
+
+function renderWarmup(){
+  document.getElementById('search-wrap').style.display='none';
+  var wus=WARMUPS[grp]||[];
+  var gl=GROUPS.find(function(g){return g.id===grp;}).label;
+  var h='<div style="padding:12px;border-bottom:1px solid var(--gray2);"><p style="font-size:11px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;">Calentamiento — '+gl+'</p>';
+  wus.forEach(function(w,i){h+='<div class="warmup-item"><span class="warmup-num">'+(i+1)+'</span><p style="font-size:12.5px;color:var(--black);margin:0;line-height:1.5;">'+w+'</p></div>';});
+  h+='<p style="font-size:11px;color:var(--gray3);margin-top:6px;line-height:1.5;">Haz esto antes de entrenar '+gl.toLowerCase()+' para calentar bien y evitar lesiones.</p></div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function renderEquipacionList(){
+  document.getElementById('search-wrap').style.display='none';
+  var gl=GROUPS.find(function(g){return g.id===grp;}).label;
+  document.getElementById('list-items').innerHTML='<div style="padding:12px;"><p style="font-size:11px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;">Equipación para '+gl+'</p><p style="font-size:12px;color:var(--gray3);margin-top:6px;">Haz clic para ver los detalles ➡️</p></div>';
+  // Show equipacion detail
+  var eq=EQUIPACION[grp];
+  var h='<div style="max-width:640px;">';
+  h+='<div class="equip-card"><h3>👟 Calzado recomendado</h3><p style="font-size:13px;color:var(--black);line-height:1.6;">'+eq.calzado+'</p></div>';
+  h+='<div class="equip-card"><h3>👕 Ropa recomendada</h3><p style="font-size:13px;color:var(--black);line-height:1.6;">'+eq.ropa+'</p></div>';
+  h+='<div class="equip-card"><h3>🎽 Accesorios útiles</h3>';
+  eq.accesorios.forEach(function(a){
+    if(typeof a==='object'&&a.icon){
+      h+='<div class="equip-item"><span class="equip-icon">'+a.icon+'</span><div class="equip-text"><strong>'+a.name+'</strong><br>'+a.desc+'</div></div>';
+    }
+  });
+  h+='</div></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function renderRutinaList(){
+  document.getElementById('search-wrap').style.display='none';
+  var h='<div style="padding:10px;"><p style="font-size:10px;color:var(--gray3);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;">Mi Rutina ('+miRutina.length+')</p>';
+  if(miRutina.length===0){
+    h+='<p style="font-size:12px;color:var(--gray3);line-height:1.5;">Todavía no has añadido ejercicios.<br><br>Haz clic en la ☆ de cualquier ejercicio para añadirlo aquí.</p>';
+  } else {
+    miRutina.forEach(function(r){
+      var safeName=r.name.replace(/'/g,'\\\'');
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:#fff;border:1px solid var(--gray2);border-radius:7px;margin-bottom:6px;cursor:pointer;" onclick="showExFromRutina(\''+safeName+'\',\''+r.group+'\',\''+r.equip+'\')">';
+      h+='<div><div style="font-size:12px;font-weight:600;color:var(--black);">'+r.name+'</div>';
+      h+='<div style="font-size:10px;color:var(--gray3);">'+GROUPS.find(function(g){return g.id===r.group;}).label+' · '+(EQUIP.find(function(e){return e.id===r.equip;})||{label:r.equip}).label+'</div></div>';
+      h+='<button onclick="event.stopPropagation();removeFromRutina(\''+safeName+'\')" style="background:none;border:none;color:#ccc;font-size:14px;cursor:pointer;padding:2px 6px;border-radius:4px;">✕</button>';
+      h+='</div>';
+    });
+    h+='<button onclick="clearRutina()" style="width:100%;margin-top:8px;padding:8px;background:#fff0f0;border:1px solid #ffcccc;color:var(--red);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;font-family:inherit;">Borrar toda la rutina</button>';
+  }
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function removeFromRutina(name){miRutina=miRutina.filter(function(r){return r.name!==name;});saveRutina();renderRutinaList();renderRutina();}
+function clearRutina(){if(confirm('¿Borrar toda la rutina?')){miRutina=[];saveRutina();renderRutinaList();renderRutina();}}
+
+function renderRutina(){
+  if(miRutina.length===0){
+    document.getElementById('detail').innerHTML='<div class="empty"><div style="font-size:40px;">⭐</div><p style="font-size:14px;color:var(--gray3);text-align:center;">Tu rutina está vacía.<br>Haz clic en la ☆ de cualquier<br>ejercicio para añadirlo.</p></div>';
+    return;
+  }
+  var byGroup={};
+  miRutina.forEach(function(r){if(!byGroup[r.group])byGroup[r.group]=[];byGroup[r.group].push(r);});
+  var h='<div style="max-width:640px;"><h2 style="font-size:18px;font-weight:800;margin-bottom:16px;">⭐ Mi Rutina</h2>';
+  Object.keys(byGroup).forEach(function(gid){
+    var gl=GROUPS.find(function(g){return g.id===gid;});
+    h+='<div style="background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:14px 16px;margin-bottom:12px;">';
+    h+='<h3 style="font-size:12px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;">'+gl.label+'</h3>';
+    byGroup[gid].forEach(function(r){
+      var safeName=r.name.replace(/'/g,'\\\'');
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--gray2);">';
+      h+='<span style="font-size:13px;color:var(--black);cursor:pointer;" onclick="showExFromRutina(\''+safeName+'\',\''+r.group+'\',\''+r.equip+'\')">'+r.name+'</span>';
+      h+='<button onclick="removeFromRutina(\''+safeName+'\')" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:13px;padding:2px 6px;">✕</button>';
+      h+='</div>';
+    });
+    h+='</div>';
+  });
+  h+='<button onclick="clearRutina()" style="width:100%;padding:10px;background:#fff0f0;border:1px solid #ffcccc;color:var(--red);border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;">Borrar toda la rutina</button></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function showExFromRutina(name,group,eq){
+  grp=group;equip=eq;selEx=name;
+  setView('ejercicios');
+  showEx(name,'Intermedio');
+}
+
+function setGroup(g){grp=g;selEx=null;renderSidebar();renderMobileStrip();if(view==='ejercicios'){document.getElementById('search-wrap').style.display='block';renderList();}else if(view==='warmup')renderWarmup();else if(view==='equipacion')renderEquipacionList();else if(view==='rutina')renderRutinaList();}
+function setEquip(e){equip=e;selEx=null;renderSidebar();renderMobileStrip();if(view==='ejercicios'){document.getElementById('search-wrap').style.display='block';renderList();}showEmpty();}
+function setLevel(l){level=l;renderList();}
+function setView(v){
+  view=v;
+  document.getElementById('tab-ej').classList.toggle('active',v==='ejercicios');
+  document.getElementById('tab-wu').classList.toggle('active',v==='warmup');
+  document.getElementById('tab-rutina').classList.toggle('active',v==='rutina');
+  renderSidebar();
+  if(v==='ejercicios'){document.getElementById('search-wrap').style.display='block';renderList();showEmpty();}
+  else if(v==='warmup'){renderWarmup();showEmpty();}
+  else if(v==='equipacion'){renderEquipacionList();}
+  else if(v==='rutina'){renderRutinaList();renderRutina();}
+}
+function showEmpty(){document.getElementById('detail').innerHTML='<div class="empty"><div style="font-size:40px;">🏋️</div><p style="font-size:14px;color:var(--gray3);text-align:center;">Selecciona un ejercicio<br>para ver los detalles</p></div>';}
+
+function showEx(name,lv){
+  selEx=name;renderList();
+  document.getElementById('list').classList.remove('open');
+  var d=getContent(name,grp,equip,lv);
+  var gl=GROUPS.find(function(g){return g.id===grp;}).label;
+  var el=(EQUIP.find(function(e){return e.id===equip;})||{label:equip}).label;
+  var inRut=isInRutina(name);
+  var safeName=name.replace(/'/g,'\\\'');
+  var h='<div class="card">';
+  // Header
+  h+='<div class="card-header">';
+  h+=getAnatomy(grp);
+  h+='<div class="card-body">';
+  h+='<h1 class="card-title">'+name+'</h1>';
+  h+='<div class="badges">';
+  h+='<span class="badge" style="background:var(--red);color:#fff;">'+gl+'</span>';
+  h+='<span class="badge" style="background:#f0f0f0;color:#555;border:1px solid var(--gray2);">'+el+'</span>';
+  if(equip==='casa') h+='<span class="badge" style="background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7;">🏠 En casa</span>';
+  h+='<span class="badge" style="background:'+LVL_BG[lv]+';color:'+LVL_C[lv]+';border:1px solid '+LVL_C[lv]+'44;">'+lv+'</span>';
+  h+='</div>';
+  if(d.mp&&d.mp.length){h+='<p class="muscles-title">Músculos principales</p><div class="muscles-row">';d.mp.forEach(function(m){h+='<span class="muscle-pill" style="background:var(--red);color:#fff;">'+m+'</span>';});h+='</div>';}
+  if(d.ms&&d.ms.length){h+='<p class="muscles-title" style="margin-top:4px;">Secundarios</p><div class="muscles-row">';d.ms.forEach(function(m){h+='<span class="muscle-pill" style="background:#f0f0f0;color:#555;border:1px solid var(--gray2);">'+m+'</span>';});h+='</div>';}
+  // Calzado
+  if(d.calzado){h+='<div style="margin-top:8px;padding:8px 10px;background:#fffbea;border:1px solid #f5c800;border-radius:6px;"><p style="font-size:11px;font-weight:700;color:#7a6000;margin-bottom:3px;">👟 Calzado</p><p style="font-size:12px;color:#5a4000;line-height:1.5;">'+d.calzado+'</p></div>';}
+  h+='</div></div>';
+  // Botón añadir a rutina
+  h+='<button onclick="toggleRutina(\''+safeName+'\',\''+grp+'\')" style="width:100%;padding:10px;background:'+(inRut?'#fff0f0':'#f0fff0')+';border:1px solid '+(inRut?'#ffcccc':'#a5d6a7')+';color:'+(inRut?'var(--red)':'#2e7d32')+';border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:inherit;margin-bottom:10px;">'+(inRut?'✕ Quitar de Mi Rutina':'⭐ Añadir a Mi Rutina')+'</button>';
+  // Video
+  h+='<a href="'+getVideoUrl(name)+'" target="_blank" style="display:flex;align-items:center;gap:10px;background:#ff0000;color:#fff;text-decoration:none;padding:12px 16px;border-radius:10px;margin-bottom:10px;font-weight:700;font-size:13px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.7 15.5V8.5l6.3 3.5-6.3 3.5z"/></svg>Ver vídeo en YouTube</a>';
+  // Técnica
+  h+='<div class="section"><h2 class="section-title" style="color:var(--red);">Cómo se hace — paso a paso</h2>';
+  (d.tecnica||[]).forEach(function(s,i){h+='<div class="step"><span class="step-num">'+(i+1)+'</span><p class="step-text">'+s+'</p></div>';});
+  h+='</div>';
+  // Consejos
+  h+='<div class="section"><h2 class="section-title" style="color:var(--red);">Consejos importantes</h2>';
+  (d.consejos||[]).forEach(function(t){h+='<div class="tip"><span class="tip-arrow">→</span><p class="tip-text">'+t+'</p></div>';});
+  h+='</div>';
+  // Errores
+  if(d.errores&&d.errores.length){
+    h+='<div class="section" style="background:#fff8f8;border-color:#ffdddd;"><h2 class="section-title" style="color:#a32d2d;">Errores que hay que evitar</h2>';
+    d.errores.forEach(function(e){h+='<div class="err"><span class="err-x">✕</span><p class="err-text">'+e+'</p></div>';});
+    h+='</div>';
+  }
+  h+='</div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+document.getElementById('mobile-menu-btn').onclick=function(){document.getElementById('list').classList.toggle('open');};
+renderSidebar();renderMobileStrip();renderList();
+</script>
+</body>
+</html>
