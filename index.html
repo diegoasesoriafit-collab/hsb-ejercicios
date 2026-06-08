@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>HSB — Nutrición</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--acc:#f5c800;--accdark:#c9a200;--black:#0a0a0a;--white:#fff;--gray:#f5f5f5;--gray2:#e8e8e8;--gray3:#888;}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--gray);color:var(--black);-webkit-font-smoothing:antialiased;}
+.header{background:var(--black);padding:0 20px;border-bottom:2px solid var(--acc);position:sticky;top:0;z-index:100;}
+.header-inner{max-width:1300px;margin:0 auto;display:flex;align-items:center;height:52px;gap:12px;}
+.header-logo{font-weight:900;font-size:18px;color:#fff;}
+.header-logo span{color:var(--acc);}
+.header-title{color:#bbb;font-size:13px;font-weight:500;}
+.header-badge{margin-left:auto;background:var(--acc);color:var(--black);font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;}
+.mobile-menu-btn{display:none;background:var(--acc);color:var(--black);border:none;border-radius:6px;padding:6px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+.layout{display:flex;height:calc(100vh - 52px);}
+.sidebar{width:195px;background:#141414;padding:10px 7px;display:flex;flex-direction:column;gap:2px;flex-shrink:0;overflow-y:auto;}
+.sidebar-label{color:#555;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;margin:4px 8px 6px;}
+.sidebar-btn{background:transparent;color:#999;border:none;border-radius:6px;padding:8px 10px;cursor:pointer;text-align:left;font-size:12px;font-family:inherit;font-weight:400;transition:all .15s;width:100%;}
+.sidebar-btn.active{background:var(--acc);color:var(--black);font-weight:700;}
+.sidebar-div{border-top:1px solid #2a2a2a;margin:6px 4px;}
+.list{width:225px;background:#fff;border-right:1px solid var(--gray2);display:flex;flex-direction:column;flex-shrink:0;}
+.list-search{padding:10px;border-bottom:1px solid var(--gray2);}
+.list-search input{width:100%;font-size:12px;padding:6px 9px;border-radius:6px;border:1px solid var(--gray2);font-family:inherit;outline:none;background:var(--gray);}
+.list-count{font-size:10px;color:var(--gray3);margin-top:4px;}
+.list-items{overflow-y:auto;flex:1;}
+.list-item{display:flex;align-items:center;justify-content:space-between;width:100%;padding:9px 12px;background:transparent;border:none;border-bottom:1px solid var(--gray2);cursor:pointer;text-align:left;font-size:12px;line-height:1.4;color:var(--black);font-family:inherit;gap:6px;transition:background .1s;}
+.list-item.active{background:var(--acc);color:var(--black);}
+.list-item-emoji{font-size:14px;flex-shrink:0;}
+.kcal-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;background:#f0f0f0;color:#555;flex-shrink:0;}
+.list-item.active .kcal-badge{background:rgba(0,0,0,0.15);color:var(--black);}
+.detail{flex:1;overflow-y:auto;padding:20px 24px;background:var(--gray);}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;opacity:.3;}
+.card{max-width:700px;}
+.food-header{background:#fff;border:1px solid var(--gray2);border-radius:12px;padding:18px;margin-bottom:12px;}
+.food-title{font-size:20px;font-weight:800;margin-bottom:10px;}
+.macros-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+.macro-card{border-radius:10px;padding:12px;text-align:center;}
+.macro-num{font-size:20px;font-weight:900;line-height:1;}
+.macro-unit{font-size:10px;font-weight:600;opacity:.7;}
+.macro-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;opacity:.8;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.info-pill{background:var(--gray);border-radius:8px;padding:8px 10px;font-size:11px;}
+.info-pill strong{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.6px;color:var(--gray3);margin-bottom:2px;}
+.fsec{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.fsec h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--accdark);margin-bottom:10px;}
+.fsec p{font-size:13px;color:var(--black);line-height:1.7;}
+.shop-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--gray2);}
+.shop-item:last-child{border-bottom:none;}
+.shop-icon{font-size:18px;flex-shrink:0;}
+.shop-text{font-size:13px;color:var(--black);line-height:1.5;}
+.shop-text strong{font-weight:700;}
+.alt-pill{display:inline-flex;background:#f0f0f0;border:1px solid var(--gray2);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--black);margin:3px;}
+.section-full{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:16px;margin-bottom:10px;}
+.section-full h2{font-size:13px;font-weight:800;color:var(--accdark);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px;}
+.warn-box{background:#fff8f8;border:1px solid #ffdddd;border-radius:10px;padding:14px 16px;margin-bottom:10px;}
+.warn-box h3{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#a32d2d;margin-bottom:10px;}
+.warn-item{display:flex;gap:8px;margin-bottom:8px;align-items:flex-start;}
+.warn-x{color:#a32d2d;font-size:13px;flex-shrink:0;margin-top:2px;}
+.comp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.comp-card{background:#fff;border:1px solid var(--gray2);border-radius:10px;padding:14px;text-align:center;}
+.comp-macro{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--gray2);font-size:12px;}
+.comp-macro:last-child{border-bottom:none;}
+.compra-cat{margin-bottom:14px;}
+.compra-cat h3{font-size:11px;font-weight:800;color:var(--accdark);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;}
+.compra-grid{display:flex;flex-wrap:wrap;gap:6px;}
+.compra-pill{background:#f0f0f0;border:1px solid var(--gray2);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:500;}
+@media(max-width:700px){
+  .sidebar{display:none;}
+  .mobile-menu-btn{display:block;}
+  .list{position:fixed;left:0;top:52px;bottom:0;z-index:50;display:none;width:245px;box-shadow:4px 0 20px rgba(0,0,0,.2);}
+  .list.open{display:flex;flex-direction:column;}
+  .detail{padding:14px;}
+  .macros-grid{grid-template-columns:repeat(2,1fr);}
+  .comp-grid{grid-template-columns:1fr;}
+  .info-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div id="login-screen" style="position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:999;">
+  <div style="background:#1a1a1a;border:1px solid #2a2a2a;border-radius:14px;padding:2.5rem;width:100%;max-width:360px;text-align:center;">
+    <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-1px;margin-bottom:4px;">HSB <span style="color:#f5c800;">|</span></div>
+    <div style="font-size:13px;color:#666;margin-bottom:2rem;">Guía de Nutrición</div>
+    <input type="password" id="login-input" placeholder="Código de acceso" style="width:100%;padding:12px 16px;background:#111;border:1px solid #333;border-radius:8px;color:#fff;font-size:15px;font-family:inherit;outline:none;text-align:center;letter-spacing:2px;margin-bottom:12px;" onkeydown="if(event.key==='Enter')doLogin()"/>
+    <div id="login-error" style="color:#f5c800;font-size:12px;font-weight:700;margin-bottom:12px;display:none;">Código incorrecto. Contacta con Diego.</div>
+    <button onclick="doLogin()" style="width:100%;padding:13px;background:#f5c800;color:#0a0a0a;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;">Entrar</button>
+    <p style="font-size:11px;color:#444;margin-top:1.5rem;">¿No tienes código? Escribe a Diego.</p>
+  </div>
+</div>
+<div class="header">
+  <div class="header-inner">
+    <div class="header-logo">HSB <span>|</span></div>
+    <div class="header-title">Guía de Nutrición</div>
+    <button class="mobile-menu-btn" id="mobile-menu-btn">☰ Menú</button>
+    <div class="header-badge">Nutrición HSB</div>
+  </div>
+</div>
+<div class="layout">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="list" id="list">
+    <div class="list-search">
+      <input type="text" id="search" placeholder="Buscar alimento..." oninput="onSearch()"/>
+      <div class="list-count" id="count"></div>
+    </div>
+    <div class="list-items" id="list-items"></div>
+  </div>
+  <div class="detail" id="detail">
+    <div class="empty"><div style="font-size:40px;">🥗</div><p style="font-size:14px;color:var(--gray3);text-align:center;">Selecciona un alimento</p></div>
+  </div>
+</div>
+<script>
+function doLogin(){var v=document.getElementById('login-input').value.trim().toUpperCase();if(v==='HSB2026'){document.getElementById('login-screen').style.display='none';try{localStorage.setItem('hsb_nut','1');}catch(e){};}else{document.getElementById('login-error').style.display='block';document.getElementById('login-input').value='';}}
+(function(){try{if(localStorage.getItem('hsb_nut')==='1')document.getElementById('login-screen').style.display='none';}catch(e){}})();
+
+var CATS=[
+  {id:'proteina',label:'🥩 Proteínas'},
+  {id:'hidrato',label:'🍚 Hidratos de carbono'},
+  {id:'legumbre',label:'🫘 Legumbres'},
+  {id:'grasa',label:'🥑 Grasas saludables'},
+  {id:'frutoseco',label:'🥜 Frutos secos y semillas'},
+  {id:'verdura',label:'🥦 Verduras y hortalizas'},
+  {id:'fruta',label:'🍎 Frutas'},
+  {id:'lacteo',label:'🥛 Lácteos'},
+  {id:'suplemento',label:'💊 Suplementos'},
+  {id:'condimento',label:'🧂 Condimentos y salsas'},
+  {id:'bebida',label:'💧 Bebidas e hidratación'},
+  {id:'snack',label:'⚡ Snacks de emergencia'},
+  {id:'evitar',label:'🚫 Alimentos a evitar'},
+  {id:'comparador',label:'📊 Comparador'},
+  {id:'recetas',label:'🍳 Recetas rápidas'},
+  {id:'mealprep',label:'📅 Meal prep'},
+  {id:'supermercado',label:'🏪 Guía supermercados'},
+  {id:'cocina_mundo',label:'🌍 Comer fuera / Mundo'},
+  {id:'alcohol',label:'🍺 Alcohol'},
+  {id:'noche',label:'🌙 Comer por la noche'},
+  {id:'consejos',label:'💡 Consejos'},
+  {id:'compra',label:'🛒 Lista de la compra'}
+];
+
+// IG = índice glucémico: B=bajo, M=medio, A=alto
+var DB=[
+  // PROTEÍNAS
+  {id:'pollo',cat:'proteina',emoji:'🍗',n:'Pechuga de pollo',kcal:165,p:31,c:0,g:3.6,ig:null,temp:'Todo el año',como:'A la plancha, al horno, hervida, en wok.',combina:'Arroz, patata, verduras asadas.',cuando:'Cualquier comida.',para:'La proteína más usada en fitness. Baja en grasa, alta en proteína.',supermercados:[{s:'Mercadona',d:'Pechuga fresca/congelada Hacendado. La congelada es igual de nutritiva.'},{s:'Lidl',d:'Muy buena relación calidad-precio en congelado.'},{s:'Carrefour',d:'Gran variedad — filetes, tiras, entera.'},{s:'Aldi',d:'Buen precio en formatos grandes congelados.'},{s:'Consum',d:'Pechuga fresca de buena calidad.'}],alt:['Pavo','Conejo','Ternera magra','Atún']},
+  {id:'pavo',cat:'proteina',emoji:'🦃',n:'Pechuga de pavo',kcal:157,p:29,c:0,g:3.2,ig:null,temp:'Todo el año',como:'Igual que el pollo. También en fiambre.',combina:'Pan integral, ensalada, aguacate.',cuando:'Cualquier comida. Desayuno como fiambre.',para:'Muy similar al pollo. Más suave de sabor.',supermercados:[{s:'Mercadona',d:'Pechuga fresca o fiambre natural sin grasa.'},{s:'Carrefour',d:'Fiambre al corte — elige "pechuga" sin almidón.'},{s:'Dia',d:'Fiambre de pavo a buen precio.'},{s:'Consum',d:'Buena variedad de formatos.'}],alt:['Pollo','Conejo','Lomo magro']},
+  {id:'atun',cat:'proteina',emoji:'🐟',n:'Atún al natural (lata)',kcal:116,p:26,c:0,g:1,ig:null,temp:'Todo el año',como:'Directo de la lata. En ensalada, con arroz, en sandwich.',combina:'Arroz, pasta, ensalada, aguacate.',cuando:'Cualquier comida. El snack más cómodo.',para:'Proteína rápida sin cocinar. Imprescindible tener siempre en casa.',supermercados:[{s:'Mercadona',d:'Atún Hacendado al natural — el mejor precio del mercado.'},{s:'Lidl',d:'Marca propia excelente y más barata.'},{s:'Aldi',d:'Muy buen precio en packs.'},{s:'Carrefour',d:'Gran variedad de marcas.'},{s:'Dia',d:'Marca propia a muy buen precio.'},{s:'Consum',d:'Buena selección de conservas.'}],alt:['Sardinas','Caballa','Mejillones']},
+  {id:'salmon',cat:'proteina',emoji:'🐠',n:'Salmón fresco',kcal:208,p:20,c:0,g:13,ig:null,temp:'Todo el año (mejor oct-mar)',como:'Al horno, a la plancha, al vapor. No más de 15 min.',combina:'Boniato, quinoa, espinacas, limón.',cuando:'Comida o cena. Máx. 2-3 veces/semana.',para:'Proteína + omega-3. Excelente para recuperación muscular.',supermercados:[{s:'Mercadona',d:'Salmón fresco en filetes. También ahumado (más sal).'},{s:'Lidl',d:'Muy buen precio. Tienen ofertas frecuentes.'},{s:'Carrefour',d:'Gran variedad de tamaños y presentaciones.'},{s:'Alcampo',d:'Buen precio en formatos grandes.'}],alt:['Trucha','Caballa','Sardinas']},
+  {id:'huevos',cat:'proteina',emoji:'🥚',n:'Huevos',kcal:155,p:13,c:1.1,g:11,ig:null,temp:'Todo el año',como:'Revueltos, tortilla, cocidos, pochados, al horno.',combina:'Cualquier verdura, pan integral, aguacate.',cuando:'Desayuno, comida o cena. Muy versátiles.',para:'Proteína completa. La yema tiene grasas saludables y vitaminas. No tengas miedo a la yema.',supermercados:[{s:'Mercadona',d:'Huevos camperos Hacendado — buena calidad.'},{s:'Lidl',d:'Muy buen precio en categoría M o L.'},{s:'Aldi',d:'Económicos y de buena calidad.'},{s:'Carrefour',d:'Los ecológicos tienen mejor perfil nutricional.'},{s:'Consum',d:'Buen precio en huevos camperos.'}],alt:['Claras pasteurizadas','Tofu','Queso cottage']},
+  {id:'ternera',cat:'proteina',emoji:'🥩',n:'Ternera magra',kcal:172,p:28,c:0,g:6,ig:null,temp:'Todo el año',como:'A la plancha, al horno, en estofado ligero.',combina:'Verduras asadas, patata, ensalada.',cuando:'Comida o cena. 2-3 veces/semana.',para:'Proteína de alta calidad + hierro + zinc.',supermercados:[{s:'Mercadona',d:'Solomillo o lomo bajo de ternera.'},{s:'Carrefour',d:'Busca menos del 10% de grasa.'},{s:'Alcampo',d:'Buena selección de cortes magros.'},{s:'Consum',d:'Ternera fresca de buena calidad.'}],alt:['Pollo','Pavo','Cerdo magro']},
+  {id:'merluza',cat:'proteina',emoji:'🐡',n:'Merluza',kcal:82,p:17,c:0,g:1.8,ig:null,temp:'Todo el año',como:'Al horno, a la plancha, al vapor, en papillote.',combina:'Patata, verduras al vapor, limón.',cuando:'Comida o cena.',para:'Pescado blanco muy bajo en grasa. Fácil de digerir.',supermercados:[{s:'Mercadona',d:'Merluza congelada en filetes — muy cómoda.'},{s:'Lidl',d:'Buena merluza congelada a muy buen precio.'},{s:'Carrefour',d:'Fresca y congelada. Gran variedad.'},{s:'Alcampo',d:'Buen precio en formatos grandes congelados.'}],alt:['Bacalao','Lubina','Dorada','Lenguado']},
+  {id:'gambas',cat:'proteina',emoji:'🦐',n:'Gambas y mariscos',kcal:99,p:21,c:0,g:1.5,ig:null,temp:'Todo el año (mejor nov-ene)',como:'A la plancha, al ajillo, cocidas, al vapor.',combina:'Arroz, pasta, ensalada, verduras.',cuando:'Comida o cena.',para:'Alta proteína y casi sin grasa. Muy completas.',supermercados:[{s:'Mercadona',d:'Gambas congeladas peladas — muy cómodas.'},{s:'Lidl',d:'Excelente precio en mariscos congelados.'},{s:'Aldi',d:'Buen precio en gambas congeladas.'},{s:'Carrefour',d:'Gran variedad fresca y congelada.'}],alt:['Mejillones','Calamar','Pulpo']},
+  {id:'mejillones',cat:'proteina',emoji:'🦪',n:'Mejillones al natural',kcal:86,p:12,c:3.7,g:2.2,ig:null,temp:'Sep-Abr (mejor invierno)',como:'Directo de la lata o al vapor.',combina:'Arroz, ensalada, patata.',cuando:'Cualquier comida. El snack perfecto en lata.',para:'Alta proteína, zinc, hierro y omega-3. Uno de los alimentos más completos y baratos.',supermercados:[{s:'Mercadona',d:'Mejillones al natural Hacendado — baratos y excelentes.'},{s:'Lidl',d:'Excelente precio en packs.'},{s:'Aldi',d:'Muy buen precio.'},{s:'Carrefour',d:'Gran variedad de tamaños.'}],alt:['Atún','Sardinas','Gambas']},
+  {id:'sardinas',cat:'proteina',emoji:'🐟',n:'Sardinas al natural',kcal:135,p:21,c:0,g:5,ig:null,temp:'Jun-Sep (frescas)',como:'Directo de la lata. A la plancha si son frescas.',combina:'Pan integral, ensalada, tomate.',cuando:'Cualquier comida.',para:'Proteína + omega-3 + calcio (si comes las espinas).',supermercados:[{s:'Mercadona',d:'Sardinas Hacendado al natural — muy baratas.'},{s:'Lidl',d:'Marca propia excelente.'},{s:'Aldi',d:'Muy buen precio en packs.'},{s:'Dia',d:'Marca propia a buen precio.'}],alt:['Atún','Caballa','Boquerones']},
+  {id:'bacalao',cat:'proteina',emoji:'🐟',n:'Bacalao',kcal:82,p:18,c:0,g:0.7,ig:null,temp:'Todo el año',como:'Al horno con verduras, a la plancha, al pil-pil (sin exceso de aceite).',combina:'Patata, pimientos, tomate, garbanzos.',cuando:'Comida o cena.',para:'Pescado blanco muy magro. Altísimo en proteína y casi sin grasa.',supermercados:[{s:'Mercadona',d:'Bacalao desalado en trozos o en lomos.'},{s:'Carrefour',d:'Gran variedad — desalado, ahumado, fresco.'},{s:'Alcampo',d:'Buena selección de formatos.'}],alt:['Merluza','Lubina','Dorada']},
+  {id:'claras',cat:'proteina',emoji:'🥛',n:'Claras de huevo pasteurizadas',kcal:52,p:11,c:0.7,g:0.2,ig:null,temp:'Todo el año',como:'En tortillas, revueltos, añadir a la avena.',combina:'Avena, verduras, especias.',cuando:'Desayuno o post-entreno.',para:'Proteína pura sin grasa. Muy prácticas para añadir a cualquier receta.',supermercados:[{s:'Mercadona',d:'Claras pasteurizadas Hacendado — brick de 500ml.'},{s:'Carrefour',d:'Variedad de formatos.'},{s:'Alcampo',d:'Buen precio en formato grande.'}],alt:['Huevos enteros','Whey protein','Yogur griego']},
+  {id:'cerdomagro',cat:'proteina',emoji:'🥩',n:'Lomo de cerdo magro',kcal:143,p:22,c:0,g:5.5,ig:null,temp:'Todo el año',como:'A la plancha, al horno, en medallones.',combina:'Manzana, mostaza, verduras asadas.',cuando:'Comida o cena.',para:'Proteína a buen precio. Más magro de lo que parece si eliges el corte correcto.',supermercados:[{s:'Mercadona',d:'Lomo de cerdo fresco en filetes.'},{s:'Lidl',d:'Muy buen precio.'},{s:'Carrefour',d:'Variedad de cortes.'}],alt:['Pollo','Pavo','Ternera']},
+  // HIDRATOS
+  {id:'arroz',cat:'hidrato',emoji:'🍚',n:'Arroz blanco',kcal:130,p:2.7,c:28,g:0.3,ig:'A',temp:'Todo el año',como:'Hervido, al vapor, en wok.',combina:'Pollo, atún, verduras salteadas.',cuando:'Comida. Antes de entrenar por la tarde.',para:'El hidrato más usado en fitness. Energía limpia y fácil de digerir.',supermercados:[{s:'Mercadona',d:'Arroz redondo/largo Hacendado — muy barato.'},{s:'Lidl',d:'Excelente calidad a buen precio.'},{s:'Aldi',d:'Muy económico.'},{s:'Carrefour',d:'Gran variedad — basmati, vaporizado, arbóreo.'},{s:'Dia',d:'Marca propia a buen precio.'}],alt:['Arroz integral','Pasta integral','Quinoa','Patata']},
+  {id:'arroz_integral',cat:'hidrato',emoji:'🌾',n:'Arroz integral',kcal:111,p:2.6,c:23,g:0.9,ig:'M',temp:'Todo el año',como:'Hervido (tarda más — 35-40 min).',combina:'Mismo que el arroz blanco.',cuando:'Comida. Mejor opción que el blanco si tienes tiempo.',para:'Más fibra y nutrientes que el blanco. Índice glucémico más bajo.',supermercados:[{s:'Mercadona',d:'Arroz integral Hacendado.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Varios tipos.'}],alt:['Arroz blanco','Quinoa','Pasta integral']},
+  {id:'avena',cat:'hidrato',emoji:'🌾',n:'Copos de avena',kcal:389,p:17,c:66,g:7,ig:'B',temp:'Todo el año',como:'Con leche o agua en microondas 2-3 min. En tortitas. En batidos.',combina:'Plátano, frutos rojos, proteína en polvo, yogur griego.',cuando:'Desayuno. Antes de entrenar por la mañana.',para:'El mejor hidrato para el desayuno. Absorción lenta — te mantiene saciado mucho tiempo. También tiene proteína.',supermercados:[{s:'Mercadona',d:'Copos de avena Hacendado — de los más baratos.'},{s:'Lidl',d:'En bolsa grande — muy buen precio.'},{s:'Aldi',d:'Excelente precio.'},{s:'Carrefour',d:'Variedad de tipos — finos, gruesos, instantáneos.'}],alt:['Granola (sin azúcar)','Pan integral','Quinoa']},
+  {id:'patata',cat:'hidrato',emoji:'🥔',n:'Patata cocida',kcal:86,p:2,c:20,g:0.1,ig:'M',temp:'Todo el año (mejor sep-feb)',como:'Hervida, al horno, al microondas. Nunca frita.',combina:'Pollo, merluza, verduras.',cuando:'Comida. Antes de entrenar.',para:'Hidrato natural con mucho potasio. Muy saciante.',supermercados:[{s:'Mercadona',d:'En bolsa o a granel.'},{s:'Lidl',d:'Muy buen precio en bolsas grandes.'},{s:'Aldi',d:'Económicas.'},{s:'Mercado',d:'La mejor calidad y precio.'},{s:'Carrefour',d:'Gran variedad de tipos.'}],alt:['Boniato','Arroz','Quinoa']},
+  {id:'boniato',cat:'hidrato',emoji:'🍠',n:'Boniato',kcal:86,p:1.6,c:20,g:0.1,ig:'M',temp:'Sep-Feb',como:'Al horno (40 min a 200°C), al vapor, hervido.',combina:'Pollo, salmón, canela, yogur griego.',cuando:'Comida o pre-entreno.',para:'Hidrato con menor índice glucémico que la patata. Rico en vitamina A.',supermercados:[{s:'Mercadona',d:'Lo tienen todo el año.'},{s:'Carrefour',d:'Gran variedad de tamaños.'},{s:'Alcampo',d:'Buen precio.'},{s:'Mercado',d:'La mejor calidad de temporada.'}],alt:['Patata','Arroz','Quinoa']},
+  {id:'pasta_int',cat:'hidrato',emoji:'🍝',n:'Pasta integral',kcal:124,p:5,c:23,g:1,ig:'M',temp:'Todo el año',como:'Al dente — 8-10 min. No te pases de cocción.',combina:'Atún, pollo, tomate natural, verduras.',cuando:'Comida. Antes de entrenar por la tarde.',para:'Más fibra que la pasta normal. Energía más sostenida.',supermercados:[{s:'Mercadona',d:'Pasta integral Hacendado — muy barata.'},{s:'Lidl',d:'Excelente precio.'},{s:'Aldi',d:'Muy económica.'},{s:'Carrefour',d:'Gran variedad de formas.'}],alt:['Arroz integral','Quinoa','Boniato']},
+  {id:'quinoa',cat:'hidrato',emoji:'🌿',n:'Quinoa',kcal:120,p:4.4,c:21,g:1.9,ig:'B',temp:'Todo el año',como:'Como el arroz — lavar primero y hervir 15 min.',combina:'Pollo, salmón, aguacate, verduras.',cuando:'Comida. Puede sustituir al arroz en cualquier receta.',para:'Uno de los pocos vegetales con proteína completa. Hidrato + proteína.',supermercados:[{s:'Mercadona',d:'Quinoa Hacendado — precio razonable.'},{s:'Lidl',d:'En bolsas a buen precio.'},{s:'Carrefour',d:'Gran variedad de tipos.'},{s:'Amazon',d:'En paquetes grandes sale más económica.'}],alt:['Arroz','Cuscús integral','Mijo']},
+  {id:'panintegral',cat:'hidrato',emoji:'🍞',n:'Pan integral (de verdad)',kcal:247,p:9,c:41,g:3.4,ig:'M',temp:'Todo el año',como:'Tostado con aguacate, pavo, huevos.',combina:'Aguacate, pavo, huevos, queso cottage.',cuando:'Desayuno o merienda.',para:'Más fibra que el pan blanco. Lee que diga "harina integral" como PRIMER ingrediente.',supermercados:[{s:'Mercadona',d:'Pan de molde integral Hacendado — comprueba la etiqueta.'},{s:'Lidl',d:'Pan de molde integral — buena calidad.'},{s:'Panadería artesana',d:'La mejor opción. Pan 100% integral sin aditivos.'}],alt:['Tortitas de arroz','Avena','Boniato']},
+  {id:'cusc',cat:'hidrato',emoji:'🌾',n:'Cuscús integral',kcal:112,p:3.8,c:23,g:0.6,ig:'M',temp:'Todo el año',como:'Solo hay que añadir agua hirviendo y esperar 5 minutos. El más rápido de todos.',combina:'Pollo, verduras asadas, especias orientales.',cuando:'Comida. Ideal cuando tienes poco tiempo.',para:'El hidrato más rápido de preparar.',supermercados:[{s:'Mercadona',d:'Cuscús Hacendado.'},{s:'Carrefour',d:'Variedad de tipos.'},{s:'Alcampo',d:'Buen precio.'}],alt:['Arroz','Quinoa','Pasta integral']},
+  {id:'mijo',cat:'hidrato',emoji:'🌾',n:'Mijo',kcal:119,p:3.5,c:23,g:1,ig:'M',temp:'Todo el año',como:'Hervido 20 min. Parecido a la quinoa.',combina:'Verduras, pollo, especias.',cuando:'Comida.',para:'Sin gluten. Rico en magnesio y hierro. Muy infrautilizado.',supermercados:[{s:'Carrefour',d:'En sección de cereales ecológicos.'},{s:'Alcampo',d:'En sección dietética.'},{s:'Amazon',d:'Mejor precio en compra online.'}],alt:['Quinoa','Arroz integral']},
+  {id:'trigo_sarraceno',cat:'hidrato',emoji:'🌾',n:'Trigo sarraceno',kcal:101,p:3.4,c:19,g:0.9,ig:'B',temp:'Todo el año',como:'Hervido como el arroz. También en harina para tortitas.',combina:'Verduras, pollo, setas, yogur.',cuando:'Comida.',para:'Sin gluten. Bajo índice glucémico. Buena fuente de magnesio.',supermercados:[{s:'Carrefour',d:'En sección ecológica.'},{s:'Amazon',d:'Más económico online.'}],alt:['Quinoa','Arroz integral']},
+  {id:'maiz',cat:'hidrato',emoji:'🌽',n:'Maíz dulce',kcal:86,p:3.2,c:18,g:1.2,ig:'M',temp:'Jun-Sep (fresco)',como:'Cocido, al horno, en ensalada (de lata).',combina:'Ensalada, pollo, atún.',cuando:'Comida o guarnición.',para:'Hidrato natural con sabor dulce. En lata es muy cómodo.',supermercados:[{s:'Mercadona',d:'Maíz en lata Hacendado — muy económico.'},{s:'Lidl',d:'Muy buen precio.'},{s:'Aldi',d:'Económico.'}],alt:['Patata','Arroz']},
+  {id:'pan_centeno',cat:'hidrato',emoji:'🍞',n:'Pan de centeno',kcal:258,p:8.5,c:48,g:1.7,ig:'B',temp:'Todo el año',como:'Tostado. Va muy bien con queso cottage o aguacate.',combina:'Queso cottage, salmón ahumado, aguacate.',cuando:'Desayuno o merienda.',para:'Índice glucémico más bajo que el pan normal. Más fibra y más saciante.',supermercados:[{s:'Lidl',d:'Excelente pan de centeno a buen precio.'},{s:'Carrefour',d:'Variedad de marcas.'},{s:'Panadería artesana',d:'La mejor opción.'}],alt:['Pan integral','Tortitas de arroz']},
+  {id:'tortitas_arroz',cat:'hidrato',emoji:'🫓',n:'Tortitas de arroz',kcal:387,p:7,c:82,g:2.8,ig:'A',temp:'Todo el año',como:'Solas o con toppings (aguacate, pavo, queso cottage).',combina:'Aguacate, pavo, queso cottage, frutos rojos.',cuando:'Merienda o desayuno rápido.',para:'Snack con pocas calorías por unidad (40 kcal/tortita). Sin gluten.',supermercados:[{s:'Mercadona',d:'Tortitas de arroz Hacendado — muy baratas.'},{s:'Lidl',d:'Buen precio.'},{s:'Aldi',d:'Económicas.'}],alt:['Pan integral','Pan de centeno']},
+  // LEGUMBRES
+  {id:'lentejas',cat:'legumbre',emoji:'🫘',n:'Lentejas',kcal:116,p:9,c:20,g:0.4,ig:'B',temp:'Todo el año',como:'En guiso, en ensalada fría, en crema.',combina:'Arroz (proteína completa), verduras, especias.',cuando:'Comida. 2-3 veces/semana.',para:'Hidrato + proteína vegetal + mucha fibra. Muy saciantes y baratas.',supermercados:[{s:'Mercadona',d:'En bote cocido o en seco Hacendado.'},{s:'Lidl',d:'Muy buen precio.'},{s:'Aldi',d:'Excelente precio.'},{s:'Dia',d:'Marca propia muy económica.'}],alt:['Garbanzos','Alubias','Quinoa']},
+  {id:'garbanzos',cat:'legumbre',emoji:'🫘',n:'Garbanzos',kcal:164,p:8.9,c:27,g:2.6,ig:'B',temp:'Todo el año',como:'En guiso, en ensalada, tostados al horno (snack).',combina:'Espinacas, bacalao, tomate, especias.',cuando:'Comida.',para:'Excelente fuente de proteína vegetal y fibra. Muy versátiles.',supermercados:[{s:'Mercadona',d:'En bote cocido Hacendado — muy cómodo.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Gran variedad.'}],alt:['Lentejas','Alubias','Hummus']},
+  {id:'alubias',cat:'legumbre',emoji:'🫘',n:'Alubias / Judías blancas',kcal:127,p:8.7,c:22,g:0.5,ig:'B',temp:'Todo el año',como:'En guiso, en ensalada fría, en crema.',combina:'Verduras, chorizo (muy poca cantidad), especias.',cuando:'Comida.',para:'Alta proteína vegetal y fibra. Muy saciantes.',supermercados:[{s:'Mercadona',d:'En bote cocido Hacendado.'},{s:'Lidl',d:'Buen precio en seco y en bote.'},{s:'Aldi',d:'Económicas.'}],alt:['Lentejas','Garbanzos']},
+  {id:'soja',cat:'legumbre',emoji:'🫘',n:'Soja (edamame)',kcal:121,p:11,c:9,g:5,ig:'B',temp:'Todo el año',como:'Hervida/cocida al vapor. En ensalada.',combina:'Arroz, verduras, salsa de soja.',cuando:'Comida o snack.',para:'La legumbre con más proteína. Proteína completa.',supermercados:[{s:'Mercadona',d:'Edamame congelado Hacendado.'},{s:'Lidl',d:'Edamame congelado a buen precio.'},{s:'Carrefour',d:'Variedad de formatos.'}],alt:['Lentejas','Garbanzos','Tofu']},
+  {id:'guisantes',cat:'legumbre',emoji:'🟢',n:'Guisantes',kcal:81,p:5.4,c:14,g:0.4,ig:'B',temp:'Abr-Jun (frescos)',como:'Al vapor, salteados, en puré.',combina:'Arroz, huevos, jamón serrano (poca cantidad).',cuando:'Comida o guarnición.',para:'Más proteína que la mayoría de verduras. Versátiles.',supermercados:[{s:'Mercadona',d:'Congelados Hacendado — perfectos.'},{s:'Lidl',d:'Excelente precio en congelado.'},{s:'Aldi',d:'Muy económicos.'}],alt:['Edamame','Habas','Lentejas']},
+  {id:'habas',cat:'legumbre',emoji:'🫘',n:'Habas',kcal:88,p:8,c:15,g:0.7,ig:'B',temp:'Mar-Jun',como:'Hervidas, salteadas con jamón, en guiso.',combina:'Jamón serrano, huevo, menta.',cuando:'Comida.',para:'Alta proteína vegetal. Sabor intenso y versátiles.',supermercados:[{s:'Mercadona',d:'Habas congeladas.'},{s:'Mercado',d:'Frescas en temporada — las mejores.'},{s:'Carrefour',d:'Congeladas todo el año.'}],alt:['Guisantes','Edamame','Lentejas']},
+  {id:'tofu',cat:'legumbre',emoji:'🫙',n:'Tofu firme',kcal:76,p:8,c:1.9,g:4.2,ig:null,temp:'Todo el año',como:'A la plancha, en wok, marinado en salsa de soja, al horno.',combina:'Arroz, salsa de soja, verduras, sésamo.',cuando:'Comida o cena.',para:'Proteína vegetal completa. Sabe a lo que lo marines.',supermercados:[{s:'Mercadona',d:'Tofu Hacendado — buen precio.'},{s:'Carrefour',d:'Variedad de tipos — firme, seda, ahumado.'},{s:'Lidl',d:'Lo tienen de forma puntual.'}],alt:['Tempeh','Soja','Garbanzos']},
+  // GRASAS
+  {id:'aguacate',cat:'grasa',emoji:'🥑',n:'Aguacate',kcal:160,p:2,c:9,g:15,ig:'B',temp:'Oct-Abr',como:'En tostadas, en ensalada, en batidos, solo.',combina:'Huevos, pavo, tostadas integrales, limón.',cuando:'Cualquier comida. Excelente en desayuno.',para:'Grasa saludable monoinsaturada. Muy saciante. Rico en potasio.',supermercados:[{s:'Mercadona',d:'Aguacates listos para comer — piel negra, ceden al presionar.'},{s:'Lidl',d:'Muy buen precio. Oferta frecuentes en bolsas de 3.'},{s:'Carrefour',d:'Gran variedad de tamaños.'},{s:'Alcampo',d:'Buen precio.'}],alt:['Aceite de oliva','Aceitunas']},
+  {id:'aove',cat:'grasa',emoji:'🫒',n:'Aceite de oliva virgen extra',kcal:884,p:0,c:0,g:100,ig:null,temp:'Todo el año (cosecha oct-dic)',como:'Para cocinar (aguanta hasta 180°C) o aliñar en crudo.',combina:'Cualquier ensalada, verdura, proteína.',cuando:'1-2 cucharadas por comida.',para:'La mejor grasa para cocinar. Reduce inflamación y protege el corazón.',supermercados:[{s:'Mercadona',d:'AOVE Hacendado — buena calidad a buen precio.'},{s:'Lidl',d:'Su AOVE es excelente. Ediciones especiales muy buenas.'},{s:'Carrefour',d:'Gran variedad de procedencias.'},{s:'Aldi',d:'Buen precio.'},{s:'Consum',d:'Buena selección de AOVE local.'}],alt:['Aceite de aguacate']},
+  {id:'aceitunas',cat:'grasa',emoji:'🫒',n:'Aceitunas',kcal:115,p:0.8,c:6,g:11,ig:null,temp:'Oct-Feb (recolección)',como:'Como snack o en ensaladas.',combina:'Atún, queso, ensalada mediterránea.',cuando:'Como aperitivo o acompañamiento.',para:'Grasa saludable en formato cómodo. Ricas en vitamina E.',supermercados:[{s:'Mercadona',d:'Gran variedad de tipos.'},{s:'Mercado',d:'Las de temporada son las mejores.'},{s:'Carrefour',d:'Variedad de aliños.'}],alt:['Aguacate','Frutos secos']},
+  {id:'coco',cat:'grasa',emoji:'🥥',n:'Aceite de coco',kcal:862,p:0,c:0,g:100,ig:null,temp:'Todo el año',como:'Para cocinar a alta temperatura. En repostería.',combina:'Avena, batidos, tortitas.',cuando:'Para cocinar ocasionalmente.',para:'Aguanta temperaturas muy altas. Sabor suave. Úsalo con moderación — tiene grasas saturadas.',supermercados:[{s:'Carrefour',d:'Marca propia y otras marcas.'},{s:'Alcampo',d:'Buen precio en formato grande.'},{s:'Amazon',d:'Más económico en paquetes grandes.'}],alt:['Aceite de oliva']},
+  // FRUTOS SECOS Y SEMILLAS
+  {id:'nueces',cat:'frutoseco',emoji:'🌰',n:'Nueces',kcal:654,p:15,c:14,g:65,ig:'B',temp:'Sep-Nov (cosecha)',como:'Crudas, en ensalada, en avena.',combina:'Avena, yogur griego, ensalada, manzana.',cuando:'Merienda o desayuno. Un puñado (30g).',para:'La reina de los frutos secos. Las más ricas en omega-3. Excelentes para el corazón.',supermercados:[{s:'Mercadona',d:'Nueces peladas Hacendado — muy buen precio.'},{s:'Lidl',d:'En bolsas grandes — muy económicas.'},{s:'Aldi',d:'Excelente precio.'},{s:'Carrefour',d:'Gran variedad.'}],alt:['Almendras','Pistachos','Anacardos']},
+  {id:'almendras',cat:'frutoseco',emoji:'🥜',n:'Almendras',kcal:579,p:21,c:22,g:50,ig:'B',temp:'Ago-Oct (cosecha)',como:'Crudas, tostadas sin sal, en leche de almendras.',combina:'Yogur griego, ensalada, fruta.',cuando:'Merienda. Un puñado (30g).',para:'Alta en proteína y magnesio. La mejor opción para snack fitness.',supermercados:[{s:'Mercadona',d:'Almendras crudas Hacendado — excelente precio.'},{s:'Lidl',d:'Muy buen precio.'},{s:'Aldi',d:'Económicas.'},{s:'Carrefour',d:'Crudas, tostadas, laminadas.'}],alt:['Nueces','Pistachos','Avellanas']},
+  {id:'pistachos',cat:'frutoseco',emoji:'🟢',n:'Pistachos',kcal:562,p:20,c:28,g:45,ig:'B',temp:'Sep-Nov',como:'Crudos o tostados sin sal.',combina:'Ensalada, yogur, fruta.',cuando:'Merienda. Un puñado.',para:'Alta en proteína entre los frutos secos. Ricos en luteína para los ojos.',supermercados:[{s:'Mercadona',d:'Pistachos sin sal Hacendado.'},{s:'Lidl',d:'Muy buen precio.'},{s:'Carrefour',d:'Variedad de formatos.'}],alt:['Almendras','Nueces']},
+  {id:'anacardos',cat:'frutoseco',emoji:'🥜',n:'Anacardos',kcal:553,p:18,c:30,g:44,ig:'B',temp:'Todo el año',como:'Crudos, en wok asiático, en mantequilla.',combina:'Pollo al curry, arroz, ensalada.',cuando:'Merienda. Un puñado.',para:'Ricos en zinc y magnesio. Sabor cremoso.',supermercados:[{s:'Mercadona',d:'Anacardos crudos o tostados.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Variedad de formatos.'}],alt:['Almendras','Nueces']},
+  {id:'avellanas',cat:'frutoseco',emoji:'🌰',n:'Avellanas',kcal:628,p:15,c:17,g:61,ig:'B',temp:'Sep-Oct',como:'Crudas o tostadas sin sal.',combina:'Chocolate negro, yogur, avena.',cuando:'Merienda.',para:'Ricas en vitamina E. Excelentes para el corazón.',supermercados:[{s:'Mercadona',d:'Avellanas tostadas sin sal.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Variedad.'}],alt:['Almendras','Nueces']},
+  {id:'cacahuetes',cat:'frutoseco',emoji:'🥜',n:'Cacahuetes / Mantequilla de cacahuete',kcal:567,p:26,c:16,g:49,ig:'B',temp:'Todo el año',como:'Crudos, tostados, en mantequilla.',combina:'Avena, tortitas, manzana, apio.',cuando:'Merienda. Un puñado o 1-2 cucharadas de mantequilla.',para:'El fruto seco con más proteína. Muy saciante y económico.',supermercados:[{s:'Mercadona',d:'Cacahuetes tostados sin sal. Mantequilla de cacahuete natural.'},{s:'Lidl',d:'Buen precio en cacahuetes.'},{s:'Carrefour',d:'Variedad de mantequillas de cacahuete.'}],alt:['Almendras','Mantequilla de almendras']},
+  {id:'pipas',cat:'frutoseco',emoji:'🌻',n:'Pipas de girasol sin sal',kcal:584,p:21,c:20,g:51,ig:'B',temp:'Jul-Sep (cosecha)',como:'Como snack, en ensalada, en pan.',combina:'Ensalada, yogur, pan integral.',cuando:'Merienda. Un puñado.',para:'Ricas en vitamina E y ácido fólico. Muy económicas.',supermercados:[{s:'Mercadona',d:'Pipas peladas sin sal Hacendado — muy baratas.'},{s:'Lidl',d:'Buen precio.'},{s:'Aldi',d:'Económicas.'}],alt:['Pipas de calabaza','Almendras']},
+  {id:'pipas_cal',cat:'frutoseco',emoji:'🟢',n:'Pipas de calabaza',kcal:559,p:30,c:11,g:49,ig:'B',temp:'Sep-Nov (cosecha)',como:'Como snack, en ensalada, en avena.',combina:'Yogur, ensalada, avena.',cuando:'Merienda.',para:'Las semillas con más proteína. Ricas en zinc y magnesio — clave para la testosterona.',supermercados:[{s:'Mercadona',d:'En sección de frutos secos.'},{s:'Carrefour',d:'Variedad de formatos.'},{s:'Amazon',d:'Más económico en bolsas grandes.'}],alt:['Pipas de girasol','Semillas de chía']},
+  {id:'chia',cat:'frutoseco',emoji:'⚫',n:'Semillas de chía',kcal:486,p:17,c:42,g:31,ig:'B',temp:'Todo el año',como:'En yogur, en avena, en agua (hacen gel), en batidos.',combina:'Yogur griego, avena, fruta.',cuando:'Desayuno o merienda. 1-2 cucharadas.',para:'Omega-3 vegetal + fibra soluble + proteína. Las que más se hinchan en el estómago.',supermercados:[{s:'Mercadona',d:'Semillas de chía Hacendado.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Variedad de marcas.'}],alt:['Semillas de lino','Cáñamo']},
+  {id:'lino',cat:'frutoseco',emoji:'🟤',n:'Semillas de lino',kcal:534,p:18,c:29,g:42,ig:'B',temp:'Todo el año',como:'Molidas (mejor absorción) en yogur, avena o pan.',combina:'Yogur, avena, batidos.',cuando:'Desayuno. 1 cucharada.',para:'Omega-3 vegetal + fibra + lignanos (beneficios hormonales).',supermercados:[{s:'Mercadona',d:'Semillas de lino Hacendado.'},{s:'Carrefour',d:'Molidas o enteras.'},{s:'Alcampo',d:'Buen precio.'}],alt:['Semillas de chía']},
+  {id:'sesamo',cat:'frutoseco',emoji:'⚪',n:'Sésamo / Tahini',kcal:573,p:17,c:26,g:50,ig:'B',temp:'Todo el año',como:'Espolvoreado en ensaladas, en pasta (tahini en hummus).',combina:'Garbanzos (hummus), ensalada, pollo.',cuando:'Como condimento o en salsas.',para:'Rico en calcio y cobre. El tahini (pasta de sésamo) es base del hummus.',supermercados:[{s:'Mercadona',d:'Semillas de sésamo y tahini.'},{s:'Carrefour',d:'Variedad de marcas.'}],alt:['Pipas','Almendras trituradas']},
+  {id:'nuez_brasil',cat:'frutoseco',emoji:'🌰',n:'Nueces de Brasil',kcal:656,p:14,c:12,g:66,ig:'B',temp:'Todo el año',como:'Crudas. Máximo 2-3 al día.',combina:'Yogur, ensalada, fruta.',cuando:'Merienda. Solo 2-3 unidades.',para:'La fuente más rica en selenio del planeta. 2-3 al día cubren toda la necesidad diaria.',supermercados:[{s:'Carrefour',d:'En frutos secos variados o solas.'},{s:'Amazon',d:'Mejor precio en bolsas grandes.'},{s:'Alcampo',d:'Buen precio.'}],alt:['Nueces','Almendras']},
+  {id:'macadamia',cat:'frutoseco',emoji:'🌰',n:'Nueces de macadamia',kcal:718,p:8,c:14,g:76,ig:'B',temp:'Todo el año',como:'Crudas o tostadas. En repostería.',combina:'Chocolate negro, yogur, avena.',cuando:'Merienda ocasional. Un puñado pequeño.',para:'Las más calóricas. Pero riquísimas en grasas monoinsaturadas.',supermercados:[{s:'Carrefour',d:'En sección de frutos secos premium.'},{s:'Amazon',d:'Mejor precio online.'}],alt:['Nueces','Almendras']},
+  // VERDURAS
+  {id:'brocoli',cat:'verdura',emoji:'🥦',n:'Brócoli',kcal:34,p:2.8,c:7,g:0.4,ig:'B',temp:'Oct-Mar',como:'Al vapor 5 min, salteado, al horno, crudo en ensalada.',combina:'Pollo, huevos, sésamo, limón.',cuando:'Comida o cena. Come todo el que quieras.',para:'Casi sin calorías, lleno de fibra y vitaminas. Uno de los vegetales más completos.',supermercados:[{s:'Mercadona',d:'Fresco o congelado. El congelado es igual de nutritivo.'},{s:'Lidl',d:'Congelado — excelente precio.'},{s:'Aldi',d:'Muy económico congelado.'},{s:'Carrefour',d:'Gran variedad.'}],alt:['Coliflor','Col','Kale']},
+  {id:'espinacas',cat:'verdura',emoji:'🥬',n:'Espinacas',kcal:23,p:2.9,c:3.6,g:0.4,ig:'B',temp:'Oct-Abr',como:'Crudas en ensalada, salteadas con ajo, en tortilla.',combina:'Huevos, ajo, limón, salmón.',cuando:'Cualquier comida.',para:'Hierro, calcio, magnesio. Casi sin calorías.',supermercados:[{s:'Mercadona',d:'Bolsa baby frescos — muy cómodas.'},{s:'Lidl',d:'Congeladas en porciones — muy económicas.'},{s:'Aldi',d:'Buen precio.'}],alt:['Rúcula','Kale','Col']},
+  {id:'tomate',cat:'verdura',emoji:'🍅',n:'Tomate',kcal:18,p:0.9,c:3.9,g:0.2,ig:'B',temp:'Jun-Sep',como:'Crudo en ensalada, cocinado en salsa, al horno.',combina:'Mozzarella, albahaca, atún, huevo.',cuando:'Cualquier comida.',para:'Licopeno potente antioxidante. Casi sin calorías.',supermercados:[{s:'Mercadona',d:'Tomates pera o cherry frescos.'},{s:'Mercado',d:'Los de temporada en verano son incomparables.'}],alt:['Pimiento','Pepino','Calabacín']},
+  {id:'pepino',cat:'verdura',emoji:'🥒',n:'Pepino',kcal:15,p:0.6,c:3.6,g:0.1,ig:'B',temp:'May-Sep',como:'Crudo, en ensalada, con hummus.',combina:'Yogur (tzatziki), tomate, hummus.',cuando:'Snack perfecto. Cualquier momento.',para:'Prácticamente agua y fibra. Casi cero calorías. Muy saciante.',supermercados:[{s:'Cualquier supermercado',d:'Disponible todo el año.'}],alt:['Apio','Zanahoria']},
+  {id:'zanahoria',cat:'verdura',emoji:'🥕',n:'Zanahoria',kcal:41,p:0.9,c:10,g:0.2,ig:'M',temp:'Todo el año',como:'Cruda, cocida, en zumo, en guiso.',combina:'Hummus, vinagreta, caldo.',cuando:'Snack o guarnición.',para:'Rica en betacaroteno (vitamina A).',supermercados:[{s:'Mercadona',d:'Zanahorias mini — perfectas para llevar.'},{s:'Mercado',d:'Más sabor y más económicas.'}],alt:['Pepino','Apio']},
+  {id:'calabacin',cat:'verdura',emoji:'🥒',n:'Calabacín',kcal:17,p:1.2,c:3.1,g:0.3,ig:'B',temp:'May-Sep',como:'A la plancha, al horno, salteado, en espirales (pasta de calabacín).',combina:'Pollo, atún, tomate, queso.',cuando:'Comida o cena.',para:'Casi sin calorías. Muy versátil. Hace de "pasta" sin hidratos.',supermercados:[{s:'Mercadona',d:'Fresco todo el año.'},{s:'Mercado',d:'El mejor en temporada de verano.'}],alt:['Berenjena','Pimiento']},
+  {id:'pimiento',cat:'verdura',emoji:'🫑',n:'Pimiento',kcal:31,p:1,c:6,g:0.3,ig:'B',temp:'Jul-Oct',como:'Crudo en ensalada, asado, salteado.',combina:'Pollo, atún, huevos, cebolla.',cuando:'Cualquier comida.',para:'El vegetal con más vitamina C. El rojo tiene más que el verde.',supermercados:[{s:'Mercadona',d:'Rojo, verde, amarillo frescos.'},{s:'Lidl',d:'Buen precio en temporada.'},{s:'Mercado',d:'Los de temporada son los mejores.'}],alt:['Tomate','Calabacín']},
+  {id:'cebolla',cat:'verdura',emoji:'🧅',n:'Cebolla',kcal:40,p:1.1,c:9.3,g:0.1,ig:'B',temp:'Todo el año',como:'Cruda, pochada, asada, en caldo.',combina:'Cualquier proteína o hidrato.',cuando:'Como base de cualquier receta.',para:'Quercetina (antiinflamatoria). Base de casi todas las recetas.',supermercados:[{s:'Cualquier supermercado',d:'Siempre disponible a muy buen precio.'}],alt:['Cebolleta','Puerro']},
+  {id:'ajo',cat:'verdura',emoji:'🧄',n:'Ajo',kcal:149,p:6.4,c:33,g:0.5,ig:'B',temp:'Todo el año',como:'Crudo o cocinado. Como condimento.',combina:'Prácticamente todo.',cuando:'Como condimento en cualquier comida.',para:'Propiedades antibacteriales y antiinflamatorias. Potencia el sabor de cualquier plato.',supermercados:[{s:'Cualquier supermercado',d:'Siempre disponible y muy barato.'}],alt:['Cebolla','Jengibre']},
+  {id:'col_kale',cat:'verdura',emoji:'🥬',n:'Kale / Col rizada',kcal:49,p:4.3,c:9,g:0.9,ig:'B',temp:'Oct-Mar',como:'En ensalada, salteado, en batidos verdes, al horno (chips).',combina:'Limón, aceite de oliva, sésamo, ajo.',cuando:'Comida o cena.',para:'El rey de los superalimentos. Calcio, hierro, vitamina K, antioxidantes.',supermercados:[{s:'Carrefour',d:'En sección de verduras ecológicas.'},{s:'Alcampo',d:'Fresco y bolsa.'},{s:'Mercado',d:'Fresco en temporada de invierno.'}],alt:['Espinacas','Brócoli']},
+  {id:'apio',cat:'verdura',emoji:'🥬',n:'Apio',kcal:16,p:0.7,c:3,g:0.2,ig:'B',temp:'Todo el año',como:'Crudo con hummus, en caldos, en zumos.',combina:'Hummus, zanahoria, manzana.',cuando:'Snack.',para:'Prácticamente cero calorías. Tiene propiedades diuréticas.',supermercados:[{s:'Mercadona',d:'En rama fresco.'},{s:'Mercado',d:'Más económico.'}],alt:['Pepino','Zanahoria']},
+  {id:'setas',cat:'verdura',emoji:'🍄',n:'Setas y champiñones',kcal:22,p:3.1,c:3.3,g:0.3,ig:'B',temp:'Oct-Dic (silvestres)',como:'Salteadas con ajo y perejil, al horno, en revueltos.',combina:'Huevos, pollo, arroz, tomillo.',cuando:'Comida o cena.',para:'Proteína vegetal, vitamina D, fibra. Sabor muy intenso.',supermercados:[{s:'Mercadona',d:'Champiñones frescos o setas variadas congeladas.'},{s:'Lidl',d:'Setas congeladas a buen precio.'},{s:'Mercado',d:'Las frescas de temporada son superiores.'}],alt:['Tofu','Espinacas']},
+  // FRUTAS
+  {id:'platano',cat:'fruta',emoji:'🍌',n:'Plátano',kcal:89,p:1.1,c:23,g:0.3,ig:'M',temp:'Todo el año',como:'Solo, con avena, en batidos, en tortitas.',combina:'Avena, yogur griego, proteína en polvo.',cuando:'Antes o después de entrenar. Primera mitad del día.',para:'Energía rápida + potasio. El mejor pre-entreno natural.',supermercados:[{s:'Mercadona',d:'Los de Canarias tienen más sabor.'},{s:'Mercado',d:'El mejor precio.'},{s:'Cualquier supermercado',d:'Siempre disponible.'}],alt:['Dátiles','Mango','Uvas']},
+  {id:'manzana',cat:'fruta',emoji:'🍎',n:'Manzana',kcal:52,p:0.3,c:14,g:0.2,ig:'B',temp:'Ago-Nov',como:'Sola, con mantequilla de cacahuete, con yogur.',combina:'Nueces, canela, yogur griego.',cuando:'Snack entre comidas.',para:'Fibra soluble (pectina). Muy saciante. El snack perfecto.',supermercados:[{s:'Mercadona',d:'Fuji, Pink Lady, Golden.'},{s:'Mercado',d:'Las de temporada son incomparables.'}],alt:['Pera','Naranja','Kiwi']},
+  {id:'frutos_rojos',cat:'fruta',emoji:'🍓',n:'Frutos rojos',kcal:32,p:0.7,c:7.7,g:0.3,ig:'B',temp:'May-Jul (frescos)',como:'En yogur, en avena, en batidos, solos.',combina:'Yogur griego, avena, queso cottage.',cuando:'Desayuno, merienda o postre.',para:'Muy pocas calorías + antioxidantes potentes.',supermercados:[{s:'Mercadona',d:'Frescos en temporada o congelados todo el año.'},{s:'Lidl',d:'Los congelados son excelentes y muy baratos.'},{s:'Aldi',d:'Muy buen precio en congelados.'}],alt:['Arándanos','Frambuesas','Moras']},
+  {id:'naranja',cat:'fruta',emoji:'🍊',n:'Naranja',kcal:47,p:0.9,c:12,g:0.1,ig:'B',temp:'Nov-Mar',como:'Entera (no en zumo). En ensalada.',combina:'Frutos secos, yogur, espinacas.',cuando:'Desayuno o merienda.',para:'Vitamina C. La entera tiene fibra — el zumo no.',supermercados:[{s:'Mercadona',d:'Naranjas de mesa para comer enteras.'},{s:'Mercado',d:'Las valencianas en invierno son excelentes.'}],alt:['Mandarina','Kiwi','Fresas']},
+  {id:'kiwi',cat:'fruta',emoji:'🥝',n:'Kiwi',kcal:61,p:1.1,c:15,g:0.5,ig:'B',temp:'Nov-Mar',como:'Solo, en ensalada de frutas, con yogur.',combina:'Yogur griego, fresas, plátano.',cuando:'Desayuno o merienda.',para:'Más vitamina C que la naranja. Mejora el sueño (consumido por la noche).',supermercados:[{s:'Mercadona',d:'Kiwis frescos todo el año.'},{s:'Lidl',d:'Buen precio.'},{s:'Mercado',d:'Los de temporada son más dulces.'}],alt:['Naranja','Fresas']},
+  {id:'pera',cat:'fruta',emoji:'🍐',n:'Pera',kcal:57,p:0.4,c:15,g:0.1,ig:'B',temp:'Ago-Nov',como:'Sola, con queso cottage, en ensalada.',combina:'Nueces, queso cottage, rúcula.',cuando:'Snack.',para:'Rica en fibra y muy suave de sabor. Digestiva.',supermercados:[{s:'Mercadona',d:'Peras Conference o Blanquilla.'},{s:'Mercado',d:'Las de temporada son superiores.'}],alt:['Manzana','Melocotón']},
+  {id:'mango',cat:'fruta',emoji:'🥭',n:'Mango',kcal:60,p:0.8,c:15,g:0.4,ig:'M',temp:'May-Sep',como:'Solo, en batidos, en ensalada tropical.',combina:'Yogur griego, pollo, lima.',cuando:'Desayuno o merienda.',para:'Rico en vitamina A y C. Sabor tropical muy saciante.',supermercados:[{s:'Mercadona',d:'Mango fresco cuando está en temporada.'},{s:'Lidl',d:'Buen precio en temporada.'},{s:'Carrefour',d:'Congelado todo el año.'}],alt:['Plátano','Papaya']},
+  {id:'melocoton',cat:'fruta',emoji:'🍑',n:'Melocotón / Nectarina',kcal:39,p:0.9,c:9.5,g:0.3,ig:'B',temp:'Jun-Sep',como:'Solo, en yogur, en ensalada.',combina:'Yogur griego, queso cottage, almendras.',cuando:'Snack de verano.',para:'Pocas calorías. Rico en vitamina A y antioxidantes.',supermercados:[{s:'Mercado',d:'Los de temporada son incomparables.'},{s:'Mercadona',d:'Fresco en verano.'}],alt:['Manzana','Pera']},
+  {id:'datiles',cat:'fruta',emoji:'🟤',n:'Dátiles',kcal:282,p:2.5,c:75,g:0.4,ig:'M',temp:'Sep-Dic',como:'Solos, en batidos pre-entreno, en repostería sin azúcar.',combina:'Mantequilla de cacahuete, avena, almendras.',cuando:'Pre-entreno o cuando necesitas energía rápida.',para:'Energía concentrada natural. Mejor que el azúcar procesado para un pre-entreno.',supermercados:[{s:'Mercadona',d:'Dátiles Medjool o Deglet Noor.'},{s:'Carrefour',d:'Variedad de tipos.'},{s:'Amazon',d:'Mejor precio en compras grandes.'}],alt:['Plátano','Uvas']},
+  // LÁCTEOS
+  {id:'yogurgriego',cat:'lacteo',emoji:'🥛',n:'Yogur griego 0%',kcal:59,p:10,c:3.6,g:0.4,ig:null,temp:'Todo el año',como:'Solo, con fruta, con frutos secos, en salsas.',combina:'Frutos rojos, plátano, nueces, miel (poca).',cuando:'Desayuno o merienda.',para:'Alta proteína, bajo en calorías. El griego tiene el doble de proteína que el normal.',supermercados:[{s:'Mercadona',d:'Yogur griego 0% Hacendado — el mejor precio/proteína.'},{s:'Lidl',d:'Excelente calidad.'},{s:'Carrefour',d:'Fage Total 0% — referencia de calidad.'},{s:'Consum',d:'Buen precio.'}],alt:['Skyr','Queso cottage','Kéfir']},
+  {id:'skyr',cat:'lacteo',emoji:'🥛',n:'Skyr islandés',kcal:63,p:11,c:4,g:0.2,ig:null,temp:'Todo el año',como:'Igual que el yogur griego.',combina:'Fruta, frutos secos, miel.',cuando:'Desayuno o merienda.',para:'Más proteína que el yogur griego. Prácticamente sin grasa.',supermercados:[{s:'Mercadona',d:'Skyr Hacendado — excelente producto.'},{s:'Carrefour',d:'Arla o Lindahls — muy buena calidad.'},{s:'Lidl',d:'Lo tienen en periodos.'}],alt:['Yogur griego 0%','Queso cottage']},
+  {id:'cottage',cat:'lacteo',emoji:'🧀',n:'Queso cottage',kcal:98,p:11,c:3.4,g:4.5,ig:null,temp:'Todo el año',como:'Solo, con fruta, en tostadas, en tortitas.',combina:'Frutos rojos, plátano, tostada integral.',cuando:'Desayuno, merienda o cena.',para:'Alta proteína con textura cremosa. Muy versátil.',supermercados:[{s:'Mercadona',d:'Queso cottage Hacendado.'},{s:'Carrefour',d:'Variedad de marcas.'},{s:'Alcampo',d:'Buen precio.'}],alt:['Skyr','Yogur griego','Requesón']},
+  {id:'kefir',cat:'lacteo',emoji:'🥛',n:'Kéfir',kcal:61,p:3.5,c:4.5,g:3.5,ig:null,temp:'Todo el año',como:'Solo, en batidos, con fruta.',combina:'Fruta, avena, semillas de chía.',cuando:'Desayuno o merienda.',para:'Proteína + probióticos. Mejora la digestión y la microbiota.',supermercados:[{s:'Mercadona',d:'Kéfir Hacendado.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Variedad de marcas.'}],alt:['Yogur griego','Skyr']},
+  {id:'requesón',cat:'lacteo',emoji:'🧀',n:'Requesón',kcal:74,p:7,c:4,g:3,ig:null,temp:'Todo el año',como:'Solo, en tostadas, en ensalada, en pasta.',combina:'Miel, fruta, tostada integral.',cuando:'Desayuno o merienda.',para:'Versátil y suave. Buena proteína a bajo coste.',supermercados:[{s:'Mercadona',d:'Requesón Hacendado — muy económico.'},{s:'Mercado',d:'El artesano es superior en sabor.'}],alt:['Cottage','Yogur griego']},
+  {id:'lechedes',cat:'lacteo',emoji:'🥛',n:'Leche desnatada',kcal:34,p:3.4,c:5,g:0.1,ig:null,temp:'Todo el año',como:'En café, en avena, en batidos.',combina:'Avena, café, proteína en polvo.',cuando:'Desayuno.',para:'Proteína y calcio con muy poca grasa.',supermercados:[{s:'Mercadona',d:'Leche desnatada Hacendado — la más barata.'},{s:'Lidl',d:'Muy buen precio.'},{s:'Aldi',d:'Económica.'}],alt:['Bebida de avena sin azúcar','Bebida de soja']},
+  // SUPLEMENTOS
+  {id:'creatina',cat:'suplemento',emoji:'💊',n:'Creatina monohidrato',kcal:0,p:0,c:0,g:0,ig:null,temp:'Todo el año',como:'5g al día disuelto en agua o en cualquier bebida.',combina:'Agua, zumo, batido proteico.',cuando:'Todos los días. Da igual la hora.',para:'El suplemento más estudiado. Aumenta fuerza, potencia y recuperación. No es hormonal — es un nutriente natural.',supermercados:[{s:'Amazon',d:'MyProtein o Bulk Powders — monohidrato puro sin sabor.'},{s:'Decathlon',d:'Creatina Aptonia — buena y económica.'},{s:'HSN Store',d:'Online — amplia variedad.'}],alt:[],noMacros:true,info:'5g al día todos los días, aunque no entrenes. Sin fases de carga. Tarda 2-4 semanas en notar efecto. No funciona en el 20-30% de las personas.'},
+  {id:'omega3s',cat:'suplemento',emoji:'🐟',n:'Omega-3 (EPA+DHA)',kcal:9,p:0,c:0,g:1,ig:null,temp:'Todo el año',como:'Con las comidas. Siempre con comida que tenga grasa.',combina:'Cualquier comida.',cuando:'Con las comidas.',para:'Reduce inflamación, mejora recuperación muscular y salud cardiovascular.',supermercados:[{s:'Amazon',d:'Nordic Naturals o Natrol — alta concentración.'},{s:'Mercadona',d:'Omega-3 básico a buen precio.'},{s:'Farmacia',d:'Solgar o Omega Via — calidad farmacéutica.'}],alt:[],noMacros:true,info:'Busca cápsulas con 500mg+ de EPA+DHA por cápsula. Guárdalas en la nevera. Solo si no comes pescado azul 2-3 veces/semana.'},
+  {id:'vitd',cat:'suplemento',emoji:'☀️',n:'Vitamina D3',kcal:0,p:0,c:0,g:0,ig:null,temp:'Especialmente en invierno',como:'Con una comida que tenga grasa.',combina:'Cualquier comida con grasa.',cuando:'Con el desayuno o la comida.',para:'El 80% de los españoles tienen déficit en invierno. Afecta a la fuerza muscular y a la testosterona.',supermercados:[{s:'Farmacia',d:'Vitamina D3 1000-2000 UI.'},{s:'Amazon',d:'Solgar o Now Foods — buena calidad.'},{s:'Mercadona',d:'Tienen vitamina D a buen precio.'}],alt:[],noMacros:true,info:'1000-2000 UI al día en invierno. En verano con 15-20 min de sol al mediodía es suficiente. Siempre D3, no D2.'},
+  {id:'whey',cat:'suplemento',emoji:'💪',n:'Proteína whey en polvo',kcal:120,p:25,c:3,g:2,ig:null,temp:'Todo el año',como:'Disuelto en agua o leche. Añadir a la avena.',combina:'Agua, leche, avena, plátano.',cuando:'Post-entreno o cuando no llegas a los gramos de proteína.',para:'Cómodo para completar la proteína diaria. No es imprescindible si comes bien.',supermercados:[{s:'Amazon',d:'MyProtein Impact Whey — mejor relación calidad/precio.'},{s:'Decathlon',d:'Aptonia Whey — muy buena y económica.'},{s:'Prozis / HSN',d:'Online — más variedad.'}],alt:['Claras de huevo','Skyr','Queso cottage'],noMacros:false},
+  // CONDIMENTOS
+  {id:'saisa_soja',cat:'condimento',emoji:'🫙',n:'Salsa de soja',kcal:53,p:8.1,c:4.9,g:0.1,ig:null,temp:'Todo el año',como:'Para marinar proteínas, en woks, en salsas.',combina:'Tofu, pollo, arroz, verduras orientales.',cuando:'Como condimento.',para:'Potencia el sabor enormemente con casi sin calorías. Da el toque umami.',supermercados:[{s:'Mercadona',d:'Salsa de soja Hacendado.'},{s:'Carrefour',d:'Variedad — normal, baja en sal, tamari (sin gluten).'}],alt:['Tamari','Aminos de coco']},
+  {id:'mostaza',cat:'condimento',emoji:'🟡',n:'Mostaza (sin azúcar)',kcal:66,p:4.4,c:5.8,g:3.6,ig:null,temp:'Todo el año',como:'Para aliñar, en salsas, para marinar.',combina:'Pollo, salmón, ensalada.',cuando:'Como condimento.',para:'Sabor intenso con muy pocas calorías. Alternativa al kétchup azucarado.',supermercados:[{s:'Mercadona',d:'Mostaza Hacendado — sin azúcar.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Variedad de tipos — Dijon, antigua, amarilla.'}],alt:['Vinagreta','Limón']},
+  {id:'vinagre',cat:'condimento',emoji:'🍶',n:'Vinagre de manzana',kcal:22,p:0,c:0.9,g:0,ig:null,temp:'Todo el año',como:'Para aliñar ensaladas, en marinados, diluido en agua.',combina:'Ensaladas, proteínas marinadas.',cuando:'Como aliño.',para:'Puede mejorar la sensibilidad a la insulina y la digestión. Muy pocos calorías.',supermercados:[{s:'Mercadona',d:'Vinagre de manzana Hacendado.'},{s:'Carrefour',d:'Con o sin filtrar (con madre).'}],alt:['Limón','Vinagre de módena']},
+  {id:'especias',cat:'condimento',emoji:'🌶️',n:'Especias (cúrcuma, comino, pimentón...)',kcal:0,p:0,c:0,g:0,ig:null,temp:'Todo el año',como:'Para sazonar cualquier plato.',combina:'Cualquier proteína, hidrato o verdura.',cuando:'En cualquier comida.',para:'Cero calorías. Dan sabor y tienen propiedades antiinflamatorias (especialmente la cúrcuma con pimienta negra).',supermercados:[{s:'Mercadona',d:'Amplia variedad de especias Hacendado — muy baratas.'},{s:'Lidl',d:'Especias básicas a muy buen precio.'},{s:'Mercado',d:'Las especias frescas del mercado son superiores.'}],alt:[]},
+  {id:'limon',cat:'condimento',emoji:'🍋',n:'Limón y zumo de limón',kcal:29,p:1.1,c:9,g:0.3,ig:null,temp:'Todo el año',como:'Para aliñar, en agua, sobre proteínas.',combina:'Pescado, ensalada, pollo, agua.',cuando:'Como aliño o bebida.',para:'Vitamina C. Mejora la absorción del hierro de las verduras. Realza todos los sabores.',supermercados:[{s:'Cualquier supermercado',d:'Siempre disponible y muy barato.'}],alt:['Vinagre de manzana','Lima']},
+  // BEBIDAS
+  {id:'agua',cat:'bebida',emoji:'💧',n:'Agua',kcal:0,p:0,c:0,g:0,ig:null,temp:'Todo el año',como:'Fría, caliente (infusión), con gas.',combina:'Todo.',cuando:'Durante todo el día.',para:'La bebida más importante. El 60% del cuerpo es agua. Sin suficiente agua el rendimiento físico y mental cae.',supermercados:[{s:'Del grifo',d:'En España el agua del grifo es segura en la mayoría de ciudades.'},{s:'Mercadona',d:'Agua mineral Hacendado — muy económica.'}],alt:[],noMacros:true,info:'Mínimo 2-3 litros al día. Más si entrenas (añade 0.5-1L por sesión de entrenamiento). Señal de buena hidratación: orina amarillo claro.'},
+  {id:'cafe',cat:'bebida',emoji:'☕',n:'Café',kcal:2,p:0.3,c:0,g:0,ig:null,temp:'Todo el año',como:'Solo, cortado, americano. Sin azúcar.',combina:'Leche desnatada, bebida de avena.',cuando:'Desayuno o pre-entreno (30-60 min antes).',para:'Cafeína = mejor rendimiento deportivo + quema más grasa + más concentración. Un café 30-60 min antes de entrenar mejora el rendimiento hasta un 15%.',supermercados:[{s:'Mercadona',d:'Café molido o en grano Hacendado.'},{s:'Lidl',d:'Excelente café en grano a muy buen precio.'},{s:'Carrefour',d:'Gran variedad.'}],alt:['Té verde','Mate'],noMacros:true,info:'Máximo 3-4 cafés al día. No tomes cafeína después de las 14-15h si tienes problemas de sueño. Evita el café con azúcar o los cafés de máquina con siropes.'},
+  {id:'te',cat:'bebida',emoji:'🍵',n:'Té verde / Matcha',kcal:1,p:0.2,c:0,g:0,ig:null,temp:'Todo el año',como:'En infusión 2-3 minutos máximo (más tiempo amarga).',combina:'Leche vegetal, limón, miel (poca).',cuando:'Desayuno o media mañana.',para:'Cafeína suave + antioxidantes + L-teanina (que reduce el nerviosismo de la cafeína).',supermercados:[{s:'Mercadona',d:'Té verde Hacendado.'},{s:'Carrefour',d:'Gran variedad de tipos.'},{s:'Amazon',d:'Matcha de calidad — busca ceremonia o culinario.'}],alt:['Café','Té negro'],noMacros:true},
+  {id:'beb_avena',cat:'bebida',emoji:'🥛',n:'Bebida de avena (sin azúcar)',kcal:47,p:1.2,c:8.6,g:1,ig:null,temp:'Todo el año',como:'En café, en avena, en batidos.',combina:'Café, avena, proteína en polvo.',cuando:'Desayuno.',para:'Alternativa a la leche si no toleras el lactosa. Más carbohidratos que la leche.',supermercados:[{s:'Mercadona',d:'Bebida de avena Hacendado — sin azúcar.'},{s:'Lidl',d:'Buen precio.'},{s:'Carrefour',d:'Variedad de marcas.'}],alt:['Leche desnatada','Bebida de soja']},
+  // SNACKS DE EMERGENCIA
+  {id:'snack1',cat:'snack',emoji:'⚡',n:'Kit emergencia (para la mochila)',kcal:0,p:0,c:0,g:0,ig:null,temp:'',como:'',combina:'',cuando:'',para:'',supermercados:[],alt:[],esInfoOnly:true,info:'Lo que siempre deberías tener en la mochila o en el coche para no tomar malas decisiones cuando tienes hambre:\n\n🥫 Lata de atún al natural\n🥜 Bolsita de almendras o nueces (30g)\n🍎 Manzana o plátano\n🥛 Yogur griego individual (van sin frío varias horas)\n🫙 Barrita de proteína (menos de 5g azúcar)\n💧 Botella de agua'},
+  {id:'snack2',cat:'snack',emoji:'🍎',n:'Snacks con 0 preparación',kcal:0,p:0,c:0,g:0,ig:null,temp:'',como:'',combina:'',cuando:'',para:'',supermercados:[],alt:[],esInfoOnly:true,info:'Cuando llegas a casa con hambre y no quieres cocinar:\n\n🥛 Yogur griego con frutos rojos + nueces — 3 minutos\n🐟 Lata de atún con tortitas de arroz — 2 minutos\n🥚 Huevos cocidos (cocínalos en batch los domingos) — 0 minutos\n🍌 Plátano con mantequilla de cacahuete — 1 minuto\n🧀 Queso cottage con fruta — 2 minutos\n🫘 Edamame congelado (microondas 3 min) con sal'},
+  {id:'snack3',cat:'snack',emoji:'🏪',n:'Snacks en gasolinera o máquina',kcal:0,p:0,c:0,g:0,ig:null,temp:'',como:'',combina:'',cuando:'',para:'',supermercados:[],alt:[],esInfoOnly:true,info:'Qué elegir cuando no tienes opciones:\n\n✅ Almendras o nueces (casi siempre hay)\n✅ Fruta fresca (manzana, plátano, naranja)\n✅ Yogur griego individual\n✅ Barrita de proteína (menos de 5g azúcar)\n✅ Agua\n\n❌ Evitar: bollería, chocolatinas, patatas fritas, zumos de tetra-brik, bebidas energéticas con mucho azúcar'}
+];
+
+var EVITAR=[
+  {id:'ultraprocesados',titulo:'Ultraprocesados',emoji:'🚫',items:[{n:'Bollería industrial',p:'Grasa saturada + azúcar + calorías vacías. Sin proteína ni fibra. Sube el azúcar y baja enseguida — quedas con más hambre.'},{n:'Cereales de desayuno (la mayoría)',p:'Azúcar disfrazado de sano. Mira la etiqueta — si el azúcar está entre los 3 primeros ingredientes, déjalo.'},{n:'Zumos de fruta',p:'Igual de azúcar que un refresco sin la fibra de la fruta.'},{n:'Snacks salados (patatas, doritos)',p:'Grasas malas + sal + calorías sin valor nutricional.'},{n:'Embutidos grasos (chorizo, salchichón)',p:'Altos en grasas saturadas y sodio. No son base de ninguna dieta de cambio corporal.'}]},
+  {id:'azucares',titulo:'Azúcares ocultos',emoji:'⚠️',items:[{n:'Salsas comerciales (kétchup, BBQ, teriyaki)',p:'Una cucharada de kétchup tiene tanto azúcar como un caramelo. Usa versiones sin azúcar.'},{n:'Yogures con sabores',p:'Un yogur de sabores tiene 10-15g azúcar. El griego natural tiene 3-4g.'},{n:'Pan de molde "integral" falso',p:'Muchos tienen harina blanca como primer ingrediente. Lee la etiqueta.'},{n:'Barritas "energéticas"',p:'La mayoría son caramelos con proteína. Más de 10g azúcar = golosina.'},{n:'Bebidas deportivas con azúcar',p:'Solo necesarias si entrenas más de 90 min. Para sesiones normales, agua.'}]},
+  {id:'habitos',titulo:'Hábitos que sabotean',emoji:'🛑',items:[{n:'Picotear mientras cocinas',p:'Calorías que no registras — pueden sumar 200-300 sin darte cuenta.'},{n:'Comer por aburrimiento o estrés',p:'La mayoría de excesos no son por hambre real. Pregúntate si tienes hambre de verdad.'},{n:'Saltarte el desayuno y luego comer de más',p:'Llegas al mediodía con mucha hambre y tomas peores decisiones.'},{n:'Comer muy rápido',p:'El cerebro tarda 20 min en recibir la señal de saciedad. Comes más de lo necesario.'},{n:'No dormir suficiente',p:'Con 5-6h de sueño, las hormonas del hambre se desregulan. Comes más y con menos control.'}]}
+];
+
+var RECETAS=[
+  {id:'r1',titulo:'Bowl de arroz con pollo',emoji:'🍗',tiempo:'20 min',dif:'Fácil',ing:['150g pechuga pollo','80g arroz seco','Brócoli al gusto','Sal, pimienta, ajo en polvo','1 cda aceite oliva'],pasos:['Cuece el arroz según instrucciones.','Corta el pollo, sazona con sal, pimienta y ajo.','En sartén con aceite, cocina el pollo 5-7 min.','Cuece brócoli al vapor 5 min.','Monta: arroz + pollo + brócoli.'],macros:{kcal:480,p:42,c:55,g:8}},
+  {id:'r2',titulo:'Tortilla de claras con verduras',emoji:'🥚',tiempo:'10 min',dif:'Fácil',ing:['4 claras + 1 huevo entero','Pimiento, cebolla, espinacas','Sal, cúrcuma','1 cdita aceite oliva'],pasos:['Corta verduras en pequeño.','Saltéalas 3-4 min con aceite.','Bate los huevos y vierte.','Cuaja a fuego medio-bajo.'],macros:{kcal:220,p:28,c:8,g:8}},
+  {id:'r3',titulo:'Avena proteica',emoji:'🌾',tiempo:'5 min',dif:'Muy fácil',ing:['60g copos de avena','200ml leche desnatada','1 scoop proteína (opcional)','Plátano o frutos rojos','Canela'],pasos:['Mezcla avena y leche.','Microondas 2-3 min.','Añade proteína y mezcla.','Añade fruta encima.'],macros:{kcal:380,p:28,c:52,g:6}},
+  {id:'r4',titulo:'Ensalada de atún express',emoji:'🐟',tiempo:'5 min',dif:'Muy fácil',ing:['2 latas atún natural','Lechuga / espinacas','Tomate cherry','Pepino','Aceite oliva y limón'],pasos:['Escurre el atún.','Corta verduras.','Monta en bol.','Añade atún encima.','Aliña con aceite y limón.'],macros:{kcal:290,p:38,c:8,g:10}},
+  {id:'r5',titulo:'Salmón al horno con boniato',emoji:'🐠',tiempo:'30 min',dif:'Fácil',ing:['200g salmón','150g boniato','Limón, ajo, romero','1 cda aceite oliva'],pasos:['Horno 200°C.','Boniato en rodajas, hornea 15 min.','Añade salmón con limón y ajo.','Hornea 15 min más.'],macros:{kcal:450,p:36,c:32,g:18}},
+  {id:'r6',titulo:'Yogur con fruta y nueces',emoji:'🥛',tiempo:'2 min',dif:'Muy fácil',ing:['200g yogur griego 0%','Frutos rojos o plátano','10g nueces','Canela'],pasos:['Pon el yogur en bol.','Añade la fruta.','Añade las nueces.','Espolvorea canela.'],macros:{kcal:220,p:15,c:22,g:7}},
+  {id:'r7',titulo:'Pollo al curry con arroz',emoji:'🍛',tiempo:'25 min',dif:'Media',ing:['150g pollo','80g arroz','100g espinacas','1 cda curry','100ml leche de coco light'],pasos:['Cuece el arroz.','Saltea el pollo con curry.','Añade leche de coco y espinacas.','Cocina 5 min más.','Sirve sobre el arroz.'],macros:{kcal:430,p:38,c:48,g:9}},
+  {id:'r8',titulo:'Tortitas de avena (3 ingredientes)',emoji:'🥞',tiempo:'10 min',dif:'Fácil',ing:['60g copos avena','2 huevos','1 plátano maduro','Canela'],pasos:['Tritura la avena hasta hacer harina.','Aplasta el plátano.','Mezcla todo.','Sartén a fuego medio, porciones pequeñas.','2-3 min por cada lado.'],macros:{kcal:360,p:18,c:50,g:10}},
+  {id:'r9',titulo:'Garbanzos salteados con espinacas',emoji:'🫘',tiempo:'15 min',dif:'Fácil',ing:['200g garbanzos (bote)','100g espinacas','2 dientes de ajo','Comino, pimentón, sal','1 cda aceite oliva'],pasos:['En sartén con aceite, sofríe el ajo picado.','Añade los garbanzos escurridos.','Saltea 3-4 min con especias.','Añade espinacas y cocina 2 min.','Sirve con limón por encima.'],macros:{kcal:280,p:14,c:38,g:8}},
+  {id:'r10',titulo:'Batido post-entreno',emoji:'🥤',tiempo:'3 min',dif:'Muy fácil',ing:['1 scoop proteína whey','1 plátano','200ml leche desnatada','5g creatina (opcional)','Hielo'],pasos:['Mete todo en la batidora.','Tritura 30 segundos.','Listo para tomar.'],macros:{kcal:310,p:32,c:38,g:3}}
+];
+
+var MEALPREP=[
+  {titulo:'¿Qué es el meal prep?',contenido:'Meal prep significa preparar comida para varios días de una vez — normalmente los domingos o un día de la semana que tengas libre. La idea es dedicar 2 horas una vez a la semana para que durante los siguientes 4-5 días solo tengas que calentar y combinar.\n\nEs la herramienta más importante para seguir el programa sin excusas.'},
+  {titulo:'Qué preparar en batch',contenido:'Proteínas:\n• 1-1.5 kg de pechuga de pollo al horno o hervida\n• 6-8 huevos cocidos\n• Varios botes de legumbres ya cocidos\n\nHidratos:\n• 400-500g de arroz cocido\n• 4-6 patatas medianas al horno o hervidas\n• 200g de quinoa cocida\n\nVerduras:\n• Brócoli al vapor en tandas grandes\n• Verduras asadas en el horno\n\nExtras:\n• Cortar toda la verdura fresca de ensalada\n• Preparar el aliño en un bote'},
+  {titulo:'Cómo conservarlo',contenido:'Nevera (4-5 días): arroz cocido, pollo, verduras asadas, legumbres, huevos cocidos.\n\nCongelador (hasta 3 meses): pollo cocinado, legumbres cocinadas, arroz cocido en bolsas.\n\nContenedores: usa fiambreras herméticas de cristal (mejor que plástico). Separa siempre la proteína de los hidratos y las verduras para poder combinar libremente.'},
+  {titulo:'El sistema de combinación',contenido:'Con el batch cooking preparado solo tienes que hacer una cosa cada vez que comes: abrir la nevera y combinar.\n\nEjemplo de combinaciones posibles con el mismo batch:\n• Pollo + arroz + brócoli\n• Pollo + quinoa + verduras asadas\n• Huevos + patata + espinacas\n• Garbanzos + arroz + tomate\n• Pollo + ensalada + aguacate\n\nEn 5 minutos tienes una comida completa del programa.'},
+  {titulo:'La lista de la compra para el batch',contenido:'Lo que compras el sábado/domingo para cocinar:\n\n🥩 1.5 kg pechuga de pollo\n🥚 12 huevos\n🍚 1 kg arroz\n🥔 1 kg patatas\n🌿 200g quinoa\n🥦 1 kg brócoli\n🫘 3 botes garbanzos o lentejas\n🥬 Bolsa espinacas\n🍅 Tomates cherry\n🥒 Pepinos y zanahorias para cortar\n\nCon esto tienes comidas para 4-5 días.'}
+];
+
+var SUPERMERCADOS={
+  mercadona:{n:'Mercadona',e:'🛒',desc:'El más completo para el programa. La marca Hacendado tiene excelente calidad.',mejores:['Pechuga pollo congelada Hacendado','Atún al natural packs','Sardinas al natural','Huevos camperos','Yogur griego 0% Hacendado','Skyr Hacendado','Avena Hacendado','Arroz Hacendado','Pasta integral Hacendado','Legumbres en bote','Aceite oliva virgen extra','Bolsa espinacas baby','Brócoli congelado','Frutos secos crudos','Creatina (parafarmacia)'],evitar:['Pan "integral" que no lo es — lee la etiqueta','Yogures con sabores','Salsas preparadas con azúcar']},
+  lidl:{n:'Lidl',e:'🏪',desc:'Mejor precio del mercado. Sus congelados y frescos son excelentes.',mejores:['Pollo congelado formatos grandes','Salmón fresco (ofertas frecuentes)','Mariscos congelados (gambas, mejillones)','Avena en bolsa grande','Frutos rojos congelados','Verduras congeladas variadas','Aceite oliva virgen extra','Frutos secos a granel','Skyr','Cerveza sin alcohol (para salidas sociales)'],evitar:['Bollería y panadería industrial','Preparados con salsas añadidas']},
+  carrefour:{n:'Carrefour',e:'🏬',desc:'Mejor variedad. Ideal para productos específicos.',mejores:['Gran variedad de pescados frescos','Fage Total 0% (mejor yogur griego)','Skyr Arla o Lindahls','Quinoa en formato grande','Gran variedad pastas integrales','Sección ecológica (kale, superalimentos)','Productos fitness y proteínas'],evitar:['Productos "fitness" con mucho azúcar oculto']},
+  aldi:{n:'Aldi',e:'🛍️',desc:'Precios muy económicos. Buenos básicos.',mejores:['Pechuga pollo congelada','Huevos a muy buen precio','Avena básica muy económica','Arroz y pasta básicos','Frutos secos — almendras y nueces','Legumbres en seco muy baratas','Conservas al natural','Verduras congeladas'],evitar:['Menos variedad que otros. Menos productos específicos fitness']},
+  consum:{n:'Consum',e:'🏪',desc:'Buena presencia en Levante y Cataluña. Productos frescos de calidad.',mejores:['Carne fresca de muy buena calidad','Pescado fresco local','Frutas y verduras de temporada regional','Productos lácteos frescos','Pan artesano integral'],evitar:['Precios algo más altos que Mercadona en básicos']},
+  dia:{n:'Dia',e:'🏪',desc:'El más económico. Para básicos a muy bajo precio.',mejores:['Conservas al natural marca propia','Legumbres en bote muy baratas','Pasta y arroz básicos','Yogures básicos','Huevos económicos'],evitar:['Menor calidad en frescos','Menos variedad en productos específicos fitness']},
+  alcampo:{n:'Alcampo',e:'🏬',desc:'Gran superficie. Buena variedad y precios competitivos.',mejores:['Carnes y pescados frescos gran variedad','Formatos grandes económicos','Sección internacional (superalimentos, alimentos exóticos)','Frutos secos en bolsas grandes','Proteínas en polvo y suplementos'],evitar:['Al ser gran superficie puede costar orientarse']}
+};
+
+var COCINA_MUNDO=[
+  {id:'italiano',e:'🇮🇹',titulo:'Restaurante italiano',contenido:'Lo que pedir:\n✅ Carpaccio de ternera — proteína pura con poco aceite\n✅ Ensalada caprese — tomate, mozzarella, albahaca\n✅ Pasta con salsa de tomate natural (pedir al dente)\n✅ Pescado o carne a la plancha con guarnición\n✅ Agua con gas en lugar de vino\n\nLo que evitar:\n❌ Carbonara, bolognesa o pasta cremosa — muy calóricas\n❌ Pan de ajo con mantequilla\n❌ Tiramisú, pannacotta — alta en azúcar y grasa\n\nEstrategia: Si pides pasta, elige tomatera o puttanesca. Come media ración y complementa con ensalada y proteína.'},
+  {id:'japones',e:'🇯🇵',titulo:'Restaurante japonés',contenido:'Lo que pedir:\n✅ Sashimi — proteína pura, casi sin calorías\n✅ Sopa miso con tofu\n✅ Edamame — proteína vegetal perfecta\n✅ Pollo teriyaki (pide que pongan la salsa aparte)\n✅ Ensalada de algas\n\nLo que evitar:\n❌ Tempura — rebozado y frito\n❌ Rolls fritos (crispy rolls)\n❌ Postres — muy altos en azúcar\n\nEstrategia: El sushi normal está bien — arroz + pescado. El problema son los rolls fritos y las salsas dulces. Limita a 6-8 piezas.'},
+  {id:'chino',e:'🇨🇳',titulo:'Restaurante chino',contenido:'Lo que pedir:\n✅ Pollo o ternera al wok con verduras\n✅ Sopa agripicante (poca cantidad)\n✅ Arroz blanco vapor (sin añadidos)\n✅ Gambas al vapor o salteadas\n\nLo que evitar:\n❌ Cerdo agridulce — mucho azúcar y rebozado\n❌ Rollitos de primavera fritos\n❌ Arroz tres delicias — lleno de grasa\n❌ Pato pekín (muy graso)\n\nEstrategia: Lo que viene "al wok con verduras" suele ser bastante limpio. Pide que reduzcan la salsa o que la pongan aparte.'},
+  {id:'mexicano',e:'🇲🇽',titulo:'Restaurante mexicano',contenido:'Lo que pedir:\n✅ Tacos de pollo o pescado (2-3 máximo)\n✅ Guacamole con crudités en lugar de nachos\n✅ Fajitas de pollo o ternera\n✅ Ensalada mexicana sin sour cream\n\nLo que evitar:\n❌ Nachos con queso fundido\n❌ Burrito grande con sour cream y queso\n❌ Margaritas y sangría — alta en azúcar y alcohol\n❌ Quesadillas fritas\n\nEstrategia: Los tacos son la mejor opción — tortilla pequeña + proteína + verduras. El guacamole en lugar de nachos te da grasas buenas.'},
+  {id:'hamburgueseria',e:'🍔',titulo:'Hamburguesería',contenido:'Lo que pedir:\n✅ Hamburguesa sin pan o con pan integral\n✅ Proteína extra (doble carne)\n✅ Ensalada como guarnición en lugar de patatas\n✅ Agua en lugar de refresco\n\nLo que evitar:\n❌ Combos con patatas fritas y refresco\n❌ Doble queso fundido + bacon + salsas\n❌ Postres y helados\n\nEstrategia: La carne de la hamburguesa es proteína. El problema son el pan, las salsas y las patatas. Sin pan = reduces 200 kcal y muchos hidratos.'}
+];
+
+var ALCOHOL=[
+  {titulo:'¿Qué le hace al músculo?',contenido:'El alcohol inhibe la síntesis proteica muscular — el proceso por el que crece el músculo. Incluso 3-4 cervezas pueden reducirla hasta un 30% durante las horas siguientes.\n\nAdemás reduce la testosterona durante 24-48h y aumenta el cortisol (que degrada el músculo). Resultado: entrenas, pero el cuerpo no aprovecha ese entrenamiento.'},
+  {titulo:'¿Y para perder grasa?',contenido:'El alcohol aporta 7 kcal/g — casi el doble del azúcar (4 kcal/g). Y son calorías vacías.\n\nCuando hay alcohol en el cuerpo, el hígado lo prioriza sobre todo — incluida la quema de grasa. Mientras metaboliza el alcohol, prácticamente no quemas grasa.\n\n4-5 cervezas = 500-700 kcal extra + 12-24h sin quemar grasa.'},
+  {titulo:'Lo menos malo',contenido:'Opciones con menos calorías:\n\n🍺 Cerveza sin alcohol: ~60 kcal — la mejor opción\n🥂 Cava brut: ~90 kcal por copa\n🍷 Vino tinto (150ml): ~120 kcal\n🍺 Cerveza normal (330ml): ~140 kcal\n🥃 Destilado solo (gin, vodka): ~70 kcal — pero se mezclan con refrescos\n\nEvitar: combinados con refrescos azucarados, cócteles, cubatas dulces (500+ kcal)'},
+  {titulo:'Regla práctica del programa',contenido:'No hace falta ser abstinente. La consistencia a largo plazo es más importante que la perfección absoluta.\n\nEvitar:\n❌ Beber la noche antes de entrenar un músculo importante\n❌ Beber hasta tarde y dormir mal — el sueño es cuando crece el músculo\n❌ Que el alcohol sea excusa para comer mal también\n\nRazonable:\n✅ Una o dos copas en cena social, de vez en cuando, no arruina el progreso\n✅ Si sabes que vas a beber, no entrenes ese día o hazlo antes\n✅ Al día siguiente, vuelve al plan sin dramatizar'}
+];
+
+var NOCHE=[
+  {titulo:'El mito de "comer por la noche engorda"',contenido:'Falso. Lo que engorda es comer más calorías de las que gastas — da igual si es a las 8 de la mañana o a las 11 de la noche.\n\nEl metabolismo no se "apaga" por la noche. Sigue funcionando reparando tejidos, regulando hormonas y manteniendo funciones vitales.'},
+  {titulo:'Qué ocurre realmente por la noche',contenido:'La hormona del crecimiento se secreta principalmente durante las primeras horas de sueño — es fundamental para la recuperación muscular.\n\nLa síntesis proteica (construir músculo) también ocurre durante el sueño. Por eso, tener proteína disponible antes de dormir ayuda a la recuperación.'},
+  {titulo:'Qué comer si tienes hambre por la noche',contenido:'Las mejores opciones antes de dormir:\n\n✅ Yogur griego 0% o skyr — proteína de absorción lenta (caseína)\n✅ Queso cottage — también alto en caseína\n✅ Huevos revueltos o tortilla\n✅ Pechuga de pavo en fiambre\n✅ Requesón con fruta\n\nLa caseína se absorbe durante 6-8 horas. Perfecta antes de dormir para alimentar el músculo durante la noche.'},
+  {titulo:'Qué evitar por la noche',contenido:'❌ Hidratos simples en cantidad (pan blanco, arroz, pasta) — si no los usas como energía, más probable que se almacenen\n❌ Grasas en exceso — ralentizan la digestión\n❌ Azúcar — sube y baja el azúcar en sangre, puede despertarte\n\nPuedes comer sin problema:\n✅ Proteína en cualquier cantidad\n✅ Verduras\n✅ Hidratos en pequeñas cantidades si tienes mucha hambre'}
+];
+
+var CONSEJOS=[
+  {id:'etiqueta',titulo:'Cómo leer una etiqueta',emoji:'🔍',contenido:[
+    {sub:'Los 4 números que importan',texto:'1️⃣ CALORÍAS (kcal)\n2️⃣ PROTEÍNAS (g)\n3️⃣ CARBOHIDRATOS — fíjate en "azúcares": cuanto menos, mejor\n4️⃣ GRASAS — fíjate en "saturadas": menos del 30% del total'},
+    {sub:'La lista de ingredientes',texto:'Van en orden de mayor a menor cantidad. Si el primer ingrediente es azúcar, harina blanca o aceite de palma — déjalo.\n\nEl pan integral de verdad tiene "harina integral" como PRIMER ingrediente.'},
+    {sub:'Palabras trampa',texto:'"Light" no = sano.\n"Sin azúcar" puede llevar edulcorantes.\n"Natural" no = sin procesado.\n"Integral" sin harina integral primero = publicidad engañosa.'}
+  ]},
+  {id:'fuera',titulo:'Comer fuera sin salirte',emoji:'🍽️',contenido:[
+    {sub:'En el menú del día',texto:'✅ Primer: ensalada, verdura, sopa, legumbre\n✅ Segundo: carne o pescado a la plancha\n✅ Postre: fruta\n❌ Evita: salsas cremosas, rebozados, fritos'},
+    {sub:'Estrategia general',texto:'Pide el aliño aparte. La proteína siempre a la plancha o al horno. El pan — si no lo ves, no lo pides.\n\nUna cena social puntual no arruina nada. La constancia semanal es lo que importa.'},
+    {sub:'De viaje por trabajo',texto:'En el hotel: huevos, pavo, yogur y fruta en el desayuno.\nEn carretera: atún en lata, frutos secos, fruta, yogur individual — en cualquier gasolinera.'}
+  ]},
+  {id:'antes',titulo:'Qué comer antes de entrenar',emoji:'⚡',contenido:[
+    {sub:'¿Cuánto tiempo antes?',texto:'1.5-2 horas antes es lo ideal. Si entrenas muy pronto, algo pequeño 30 min antes es suficiente.'},
+    {sub:'Por la mañana',texto:'Si entrenas nada más levantarte: un plátano o fruta pequeña 20-30 min antes.\nSi entrenas 1-2h después: avena + proteína o tortitas de avena con plátano.'},
+    {sub:'Por la tarde',texto:'La comida del mediodía es tu pre-entreno. Hidrato + proteína + verdura.\nNo comas justo antes — deja al menos 1.5h.'}
+  ]},
+  {id:'despues',titulo:'Qué comer después de entrenar',emoji:'💪',contenido:[
+    {sub:'Lo que necesitas',texto:'1️⃣ PROTEÍNA: para reparar y construir músculo.\n2️⃣ HIDRATOS: para reponer el glucógeno gastado.\n\nEjemplo: pollo + arroz + verdura.'},
+    {sub:'Si no puedes comer al momento',texto:'Batido de proteína con plátano.\nO yogur griego con fruta y avena.'},
+    {sub:'Lo que NO hacer',texto:'❌ No comer nada después durante horas.\n❌ Solo proteína sin hidratos.\n❌ Alcohol después — interfiere directamente con el crecimiento muscular.'}
+  ]}
+];
+
+var COMPRA={
+  proteinas:['Pechuga de pollo (2 kg)','Pechuga de pavo (1 kg)','Atún al natural (12 latas)','Sardinas al natural (6 latas)','Mejillones al natural (6 latas)','Huevos (12 u)','Salmón fresco (4 filetes)','Merluza congelada','Gambas congeladas','Yogur griego 0% (6 u)','Skyr (4 u)','Queso cottage'],
+  hidratos:['Arroz (1 kg)','Copos de avena (500g)','Patatas (1 kg)','Boniatos (500g)','Pasta integral (500g)','Pan integral','Legumbres en bote (lentejas + garbanzos + alubias)','Quinoa (500g)','Tortitas de arroz'],
+  verduras:['Brócoli fresco o congelado','Espinacas baby (bolsa)','Tomates','Pepinos','Zanahorias','Pimiento rojo y verde','Cebolla y ajo','Lechuga o rúcula','Mix verduras congelado','Champiñones'],
+  frutas:['Plátanos (racimo)','Manzanas (bolsa)','Naranjas','Frutos rojos congelados','Kiwis','Limón'],
+  grasas:['Aceite de oliva virgen extra','Aguacates (3-4)','Nueces o almendras (bolsa)','Aceitunas','Semillas de chía'],
+  extras:['Especias: sal, pimienta, comino, pimentón, orégano, curry, cúrcuma','Salsa de soja','Mostaza sin azúcar','Vinagre de manzana','Caldo pollo sin sal','Canela']
+};
+
+// STATE
+var catSel='proteina',selId=null,viewMode='alimentos',comparSel=[];
+
+function renderSidebar(){
+  var sb=document.getElementById('sidebar');
+  var alimCats=['proteina','hidrato','legumbre','grasa','frutoseco','verdura','fruta','lacteo','suplemento','condimento','bebida','snack'];
+  var toolCats=['evitar','comparador','recetas','mealprep','supermercado','cocina_mundo','alcohol','noche','consejos','compra'];
+  var h='<div class="sidebar-label">Alimentos</div>';
+  alimCats.forEach(function(id){var c=CATS.find(function(x){return x.id===id;});h+='<button class="sidebar-btn'+(catSel===id&&viewMode==='alimentos'?' active':'')+'" onclick="setCat(\''+id+'\')">'+c.label+'</button>';});
+  h+='<div class="sidebar-div"></div><div class="sidebar-label">Guías y herramientas</div>';
+  toolCats.forEach(function(id){var c=CATS.find(function(x){return x.id===id;});h+='<button class="sidebar-btn'+(viewMode===id?' active':'')+'" onclick="setTool(\''+id+'\')">'+c.label+'</button>';});
+  sb.innerHTML=h;
+}
+
+function setCat(cat){catSel=cat;viewMode='alimentos';selId=null;renderSidebar();renderList();showEmpty();}
+function setTool(v){viewMode=v;selId=null;renderSidebar();
+  if(v==='evitar'){renderEvitarList();showEmpty();}
+  else if(v==='comparador'){renderComparList();showEmpty();}
+  else if(v==='recetas'){renderRecetasList();showEmpty();}
+  else if(v==='mealprep'){renderMealPrepList();renderMealPrep();}
+  else if(v==='supermercado'){renderSuperList();showEmpty();}
+  else if(v==='cocina_mundo'){renderMundoList();showEmpty();}
+  else if(v==='alcohol'){renderInfoList('alcohol');renderInfo('alcohol');}
+  else if(v==='noche'){renderInfoList('noche');renderInfo('noche');}
+  else if(v==='consejos'){renderConsejosList();showEmpty();}
+  else if(v==='compra'){document.getElementById('list-items').innerHTML='<div style="padding:12px;font-size:12px;color:var(--gray3);">Lista base HSB</div>';renderCompraView();}
+}
+
+function renderList(){
+  var s=document.getElementById('search').value.toLowerCase();
+  var items=DB.filter(function(a){return a.cat===catSel&&!a.esInfoOnly&&a.n.toLowerCase().indexOf(s)!==-1;});
+  document.getElementById('count').textContent=items.length+' alimentos';
+  var h='';
+  items.forEach(function(a){
+    var act=selId===a.id;
+    h+='<button class="list-item'+(act?' active':'')+'" onclick="showItem(\''+a.id+'\')">';
+    h+='<span class="list-item-emoji">'+a.emoji+'</span><span style="flex:1;text-align:left;">'+a.n+'</span>';
+    if(!a.noMacros&&a.kcal>0) h+='<span class="kcal-badge">'+a.kcal+'kcal</span>';
+    h+='</button>';
+  });
+  document.getElementById('list-items').innerHTML=h||'<div style="padding:2rem;text-align:center;font-size:13px;color:var(--gray3);">Sin resultados</div>';
+}
+
+function renderEvitarList(){
+  var h='<div style="padding:10px;">';
+  EVITAR.forEach(function(e){h+='<button onclick="showEvitar(\''+e.id+'\')" class="list-item"><span class="list-item-emoji">'+e.emoji+'</span><span>'+e.titulo+'</span></button>';});
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function renderComparList(){
+  var h='<div style="padding:10px;"><p style="font-size:10px;color:var(--gray3);font-weight:700;text-transform:uppercase;margin-bottom:6px;">Selecciona 2 alimentos</p>';
+  DB.filter(function(a){return !a.esInfoOnly&&a.kcal>0;}).forEach(function(a){
+    var sel=comparSel.indexOf(a.id)!==-1;
+    h+='<button onclick="toggleCompar(\''+a.id+'\')" class="list-item'+(sel?' active':'')+'">';
+    h+='<span class="list-item-emoji">'+a.emoji+'</span><span style="flex:1;text-align:left;">'+a.n+'</span>';
+    if(sel) h+='<span style="font-size:10px;font-weight:700;">✓</span>';
+    h+='</button>';
+  });
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function toggleCompar(id){
+  var idx=comparSel.indexOf(id);
+  if(idx!==-1)comparSel.splice(idx,1);
+  else if(comparSel.length<2)comparSel.push(id);
+  else comparSel=[comparSel[1],id];
+  renderComparList();
+  if(comparSel.length===2)renderComparacion();
+  else showEmpty();
+}
+
+function renderComparacion(){
+  var a1=DB.find(function(a){return a.id===comparSel[0];});
+  var a2=DB.find(function(a){return a.id===comparSel[1];});
+  var h='<div class="card"><h2 style="font-size:16px;font-weight:800;margin-bottom:14px;">📊 Comparativa por 100g</h2><div class="comp-grid">';
+  [a1,a2].forEach(function(a){
+    h+='<div class="comp-card"><div style="font-size:24px;margin-bottom:4px;">'+a.emoji+'</div><div style="font-size:13px;font-weight:800;margin-bottom:10px;">'+a.n+'</div>';
+    h+='<div class="comp-macro"><span style="color:var(--gray3);font-weight:600;font-size:12px;">Calorías</span><span style="font-weight:700;font-size:12px;">'+a.kcal+' kcal</span></div>';
+    h+='<div class="comp-macro"><span style="color:#c0392b;font-weight:600;font-size:12px;">Proteína</span><span style="font-weight:700;color:#c0392b;font-size:12px;">'+a.p+'g</span></div>';
+    h+='<div class="comp-macro"><span style="color:#d35400;font-weight:600;font-size:12px;">Hidratos</span><span style="font-weight:700;color:#d35400;font-size:12px;">'+a.c+'g</span></div>';
+    h+='<div class="comp-macro"><span style="color:#27ae60;font-weight:600;font-size:12px;">Grasas</span><span style="font-weight:700;color:#27ae60;font-size:12px;">'+a.g+'g</span></div>';
+    h+='</div>';
+  });
+  h+='</div>';
+  var masP=a1.p>=a2.p?a1:a2;
+  var menosK=a1.kcal<=a2.kcal?a1:a2;
+  h+='<div class="fsec"><h3>🏆 Resumen</h3><p style="font-size:13px;line-height:1.7;"><strong>Más proteína:</strong> '+masP.emoji+' '+masP.n+' ('+masP.p+'g vs '+(a1===masP?a2.p:a1.p)+'g)<br><strong>Menos calorías:</strong> '+menosK.emoji+' '+menosK.n+' ('+menosK.kcal+' kcal vs '+(a1===menosK?a2.kcal:a1.kcal)+' kcal)</p></div></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function renderRecetasList(){
+  var h='<div style="padding:10px;">';
+  RECETAS.forEach(function(r){
+    h+='<button onclick="showReceta(\''+r.id+'\')" class="list-item"><span class="list-item-emoji">'+r.emoji+'</span><div style="flex:1;text-align:left;"><div>'+r.titulo+'</div><div style="font-size:10px;color:var(--gray3);">'+r.tiempo+' · '+r.dif+'</div></div></button>';
+  });
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function renderMealPrepList(){
+  var h='<div style="padding:10px;">';
+  MEALPREP.forEach(function(m,i){
+    h+='<button onclick="showMealPrep('+i+')" class="list-item"><span style="flex:1;text-align:left;font-size:12px;">'+m.titulo+'</span></button>';
+  });
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function renderSuperList(){
+  var h='<div style="padding:10px;">';
+  Object.keys(SUPERMERCADOS).forEach(function(k){var s=SUPERMERCADOS[k];h+='<button onclick="showSuper(\''+k+'\')" class="list-item"><span class="list-item-emoji">'+s.e+'</span><span>'+s.n+'</span></button>';});
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function renderMundoList(){
+  var h='<div style="padding:10px;">';
+  COCINA_MUNDO.forEach(function(m){h+='<button onclick="showMundo(\''+m.id+'\')" class="list-item"><span class="list-item-emoji">'+m.e+'</span><span>'+m.titulo+'</span></button>';});
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function renderInfoList(type){
+  var data=type==='alcohol'?ALCOHOL:NOCHE;
+  var h='<div style="padding:10px;">';
+  data.forEach(function(d,i){h+='<button onclick="showInfoItem(\''+type+'\','+i+')" class="list-item"><span style="flex:1;text-align:left;font-size:12px;">'+d.titulo+'</span></button>';});
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function renderConsejosList(){
+  var h='<div style="padding:10px;">';
+  CONSEJOS.forEach(function(c){h+='<button onclick="showConsejo(\''+c.id+'\')" class="list-item"><span class="list-item-emoji">'+c.emoji+'</span><span>'+c.titulo+'</span></button>';});
+  h+='</div>';
+  document.getElementById('list-items').innerHTML=h;
+}
+
+function showEmpty(){document.getElementById('detail').innerHTML='<div class="empty"><div style="font-size:40px;">🥗</div><p style="font-size:14px;color:var(--gray3);text-align:center;">Selecciona un elemento</p></div>';}
+
+function showItem(id){
+  selId=id;renderList();
+  document.getElementById('list').classList.remove('open');
+  var a=DB.find(function(x){return x.id===id;});
+  if(!a)return;
+  if(a.esInfoOnly){
+    document.getElementById('detail').innerHTML='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">'+a.emoji+'</div><div class="food-title">'+a.n+'</div></div><div class="fsec"><p style="font-size:13px;line-height:1.7;">'+a.info.replace(/\n/g,'<br>')+'</p></div></div>';
+    return;
+  }
+  var igLabel={'B':'Bajo 🟢','M':'Medio 🟡','A':'Alto 🔴'};
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">'+a.emoji+'</div><div class="food-title">'+a.n+'</div>';
+  if(!a.noMacros&&a.kcal>0){
+    h+='<div class="macros-grid">';
+    h+='<div class="macro-card" style="background:#1a1a1a;color:#fff;"><div class="macro-num">'+a.kcal+'</div><div class="macro-label">Calorías</div></div>';
+    h+='<div class="macro-card" style="background:#c0392b22;"><div class="macro-num" style="color:#c0392b;">'+a.p+'<span class="macro-unit">g</span></div><div class="macro-label" style="color:#c0392b;">Proteína</div></div>';
+    h+='<div class="macro-card" style="background:#d3540022;"><div class="macro-num" style="color:#d35400;">'+a.c+'<span class="macro-unit">g</span></div><div class="macro-label" style="color:#d35400;">Hidratos</div></div>';
+    h+='<div class="macro-card" style="background:#27ae6022;"><div class="macro-num" style="color:#27ae60;">'+a.g+'<span class="macro-unit">g</span></div><div class="macro-label" style="color:#27ae60;">Grasas</div></div>';
+    h+='</div><p style="font-size:10px;color:var(--gray3);margin-top:4px;">Valores por 100g</p>';
+    h+='<div class="info-grid">';
+    if(a.ig) h+='<div class="info-pill"><strong>Índice glucémico</strong>'+igLabel[a.ig]+'</div>';
+    if(a.temp) h+='<div class="info-pill"><strong>Temporada</strong>'+a.temp+'</div>';
+    if(a.como) h+='<div class="info-pill"><strong>Cómo cocinarlo</strong>'+a.como+'</div>';
+    if(a.combina) h+='<div class="info-pill"><strong>Combina bien con</strong>'+a.combina+'</div>';
+    h+='</div>';
+  }
+  if(a.info) h+='<div style="background:#fffbea;border:1px solid #f5c800;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:12px;color:#7a6000;line-height:1.6;">'+a.info+'</div>';
+  h+='</div>';
+  if(a.cuando) h+='<div class="fsec"><h3>⏰ Cuándo tomarlo</h3><p>'+a.cuando+'</p></div>';
+  if(a.para) h+='<div class="fsec"><h3>💪 Para qué sirve</h3><p>'+a.para+'</p></div>';
+  if(a.supermercados&&a.supermercados.length){
+    h+='<div class="fsec"><h3>🛒 Dónde comprarlo</h3>';
+    a.supermercados.forEach(function(s){h+='<div class="shop-item"><span class="shop-icon">🏪</span><div class="shop-text"><strong>'+s.s+'</strong><br>'+s.d+'</div></div>';});
+    h+='</div>';
+  }
+  if(a.alt&&a.alt.length){h+='<div class="fsec"><h3>🔄 Alternativas similares</h3><div style="display:flex;flex-wrap:wrap;">';a.alt.forEach(function(x){h+='<span class="alt-pill">'+x+'</span>';});h+='</div></div>';}
+  h+='</div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function showEvitar(id){
+  document.getElementById('list').classList.remove('open');
+  var e=EVITAR.find(function(x){return x.id===id;});
+  if(!e)return;
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">'+e.emoji+'</div><h1 style="font-size:18px;font-weight:800;">'+e.titulo+'</h1></div><div class="warn-box"><h3>Por qué evitarlos</h3>';
+  e.items.forEach(function(item){h+='<div class="warn-item"><span class="warn-x">✕</span><div><p style="font-size:13px;font-weight:700;margin-bottom:2px;">'+item.n+'</p><p style="font-size:12px;color:#555;line-height:1.5;">'+item.p+'</p></div></div>';});
+  h+='</div></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function showReceta(id){
+  document.getElementById('list').classList.remove('open');
+  var r=RECETAS.find(function(x){return x.id===id;});
+  if(!r)return;
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">'+r.emoji+'</div><h1 style="font-size:18px;font-weight:800;margin-bottom:6px;">'+r.titulo+'</h1>';
+  h+='<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;"><span style="background:#f0f0f0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;">⏱️ '+r.tiempo+'</span><span style="background:#f0f0f0;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600;">👨‍🍳 '+r.dif+'</span></div>';
+  h+='<div class="macros-grid">';
+  h+='<div class="macro-card" style="background:#1a1a1a;color:#fff;"><div class="macro-num">'+r.macros.kcal+'</div><div class="macro-label">Calorías</div></div>';
+  h+='<div class="macro-card" style="background:#c0392b22;"><div class="macro-num" style="color:#c0392b;">'+r.macros.p+'<span class="macro-unit">g</span></div><div class="macro-label" style="color:#c0392b;">Proteína</div></div>';
+  h+='<div class="macro-card" style="background:#d3540022;"><div class="macro-num" style="color:#d35400;">'+r.macros.c+'<span class="macro-unit">g</span></div><div class="macro-label" style="color:#d35400;">Hidratos</div></div>';
+  h+='<div class="macro-card" style="background:#27ae6022;"><div class="macro-num" style="color:#27ae60;">'+r.macros.g+'<span class="macro-unit">g</span></div><div class="macro-label" style="color:#27ae60;">Grasas</div></div>';
+  h+='</div></div>';
+  h+='<div class="fsec"><h3>🥬 Ingredientes</h3>';
+  r.ing.forEach(function(i){h+='<div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid var(--gray2);font-size:13px;"><span>•</span><span>'+i+'</span></div>';});
+  h+='</div><div class="fsec"><h3>👨‍🍳 Preparación</h3>';
+  r.pasos.forEach(function(p,i){h+='<div style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;"><span style="min-width:22px;height:22px;background:var(--acc);color:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+(i+1)+'</span><p style="font-size:13px;line-height:1.6;margin:0;">'+p+'</p></div>';});
+  h+='</div></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function renderMealPrep(){
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">📅</div><h1 style="font-size:18px;font-weight:800;">Meal Prep — Cocina para toda la semana</h1></div>';
+  MEALPREP.forEach(function(m){h+='<div class="section-full"><h2>'+m.titulo+'</h2><p style="font-size:13px;line-height:1.7;">'+m.contenido.replace(/\n/g,'<br>')+'</p></div>';});
+  h+='</div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function showMealPrep(i){renderMealPrep();}
+
+function showSuper(k){
+  document.getElementById('list').classList.remove('open');
+  var s=SUPERMERCADOS[k];
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">'+s.e+'</div><h1 style="font-size:18px;font-weight:800;margin-bottom:6px;">'+s.n+'</h1><p style="font-size:13px;color:#555;line-height:1.6;">'+s.desc+'</p></div>';
+  h+='<div class="fsec"><h3>✅ Lo mejor para comprar</h3>';
+  s.mejores.forEach(function(item){h+='<div style="display:flex;gap:8px;padding:4px 0;font-size:13px;"><span style="color:var(--accdark);">→</span><span>'+item+'</span></div>';});
+  h+='</div>';
+  h+='<div class="warn-box"><h3>Qué evitar</h3>';
+  s.evitar.forEach(function(e){h+='<div class="warn-item"><span class="warn-x">✕</span><p style="font-size:13px;color:#555;line-height:1.5;">'+e+'</p></div>';});
+  h+='</div></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function showMundo(id){
+  document.getElementById('list').classList.remove('open');
+  var m=COCINA_MUNDO.find(function(x){return x.id===id;});
+  if(!m)return;
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">'+m.e+'</div><h1 style="font-size:18px;font-weight:800;">'+m.titulo+'</h1></div>';
+  h+='<div class="section-full"><p style="font-size:13px;line-height:1.8;">'+m.contenido.replace(/\n/g,'<br>')+'</p></div></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function renderInfo(type){
+  var data=type==='alcohol'?ALCOHOL:NOCHE;
+  var title=type==='alcohol'?'🍺 Alcohol y el programa':'🌙 Comer por la noche';
+  var h='<div class="card"><div class="food-header"><h1 style="font-size:18px;font-weight:800;">'+title+'</h1></div>';
+  data.forEach(function(d){h+='<div class="section-full"><h2>'+d.titulo+'</h2><p style="font-size:13px;line-height:1.7;">'+d.contenido.replace(/\n/g,'<br>')+'</p></div>';});
+  h+='</div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function showInfoItem(type,i){renderInfo(type);}
+
+function showConsejo(id){
+  document.getElementById('list').classList.remove('open');
+  var c=CONSEJOS.find(function(x){return x.id===id;});
+  if(!c)return;
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">'+c.emoji+'</div><h1 style="font-size:18px;font-weight:800;">'+c.titulo+'</h1></div>';
+  c.contenido.forEach(function(item){h+='<div class="section-full"><h2>'+item.sub+'</h2><p style="font-size:13px;line-height:1.7;">'+item.texto.replace(/\n/g,'<br>')+'</p></div>';});
+  h+='</div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function renderCompraView(){
+  var labels={proteinas:'🥩 Proteínas',hidratos:'🍚 Hidratos',verduras:'🥦 Verduras',frutas:'🍎 Frutas',grasas:'🥑 Grasas',extras:'🧂 Extras'};
+  var h='<div class="card"><div class="food-header"><div style="font-size:32px;margin-bottom:6px;">🛒</div><h1 style="font-size:18px;font-weight:800;">Lista de la compra HSB</h1><p style="font-size:13px;color:var(--gray3);margin-top:4px;">Lo que Diego recomienda tener siempre en casa.</p></div>';
+  Object.keys(COMPRA).forEach(function(k){
+    h+='<div class="compra-cat"><h3>'+labels[k]+'</h3><div class="compra-grid">';
+    COMPRA[k].forEach(function(item){h+='<span class="compra-pill">'+item+'</span>';});
+    h+='</div></div>';
+  });
+  h+='<div style="background:#fffbea;border:1px solid #f5c800;border-radius:10px;padding:14px;margin-top:4px;"><p style="font-size:12px;color:#7a6000;line-height:1.6;"><strong>💡 Consejo de Diego:</strong> Compra una vez a la semana y cocina en batch el domingo. Así durante la semana solo calientas y combinas.</p></div></div>';
+  document.getElementById('detail').innerHTML=h;
+}
+
+function onSearch(){if(viewMode==='alimentos')renderList();}
+document.getElementById('mobile-menu-btn').onclick=function(){document.getElementById('list').classList.toggle('open');};
+renderSidebar();renderList();
+</script>
+</body>
+</html>
